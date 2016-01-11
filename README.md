@@ -17,4 +17,4 @@ mvn generate-sources
 ```
 To run
 
-1. open "webapp/index.html" in browser. If you are using firefox browser then you can open it directly from disk. For others you will have to serve the file via some http server. Other browsers don ot allow cross origin requests.
+1. open "webapp/index.html" in browser. If you are using firefox browser then you can open it directly from disk. For others you will have to serve the file via. some http server. Other browsers do not allow cross origin requests.
