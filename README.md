@@ -18,5 +18,5 @@ mvn generate-sources
 To run
 
 1. open "webapp/index.html" in browser. If you are using firefox browser then you can open it directly from disk. For others you will have to serve the file via. some http server. Other browsers do not allow cross origin requests.
-2. move your avatar using the "w a s d" keys. To run press shift and "w". Right click and drag mouse to look around. Click the "Vincent" or "Joan" button to swtich avatar.
+2. move your avatar using the "w a s d" keys. To run press shift and "w". Right click and drag mouse to look around. Click the "Vincent" or "Joan" button to swtich between male , femal avatar.
 
