@@ -2,7 +2,7 @@
 
 Vishva - A hindi word for "World"
 
-A small world created using [BabylonJS](http://www.babylonjs.com/) a 3d frameworl and [JSweet](http://www.jsweet.org/)  a java to javscript transpiler
+A small world created using [BabylonJS](http://www.babylonjs.com/) a 3D HTML Webgl framework and [JSweet](http://www.jsweet.org/)  a java to javscript transpiler
 
 To build
 1. download project
