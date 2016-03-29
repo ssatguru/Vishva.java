@@ -20,6 +20,12 @@ To run
 1. open "webapp/index.html" in browser. If you are using firefox browser then you can open it directly from disk. For others you will have to serve the file via. some http server. Other browsers do not allow cross origin requests.
 2. move your avatar using the "w a s d" keys. To run press shift and "w". Right click and drag mouse to look around. Click the "Vincent" or "Joan" button to swtich between male , female avatar.
 
-For demo see [http://ssatguru.appspot.com/babylonjs/Vishva/webapp/index.html](http://ssatguru.appspot.com/babylonjs/Vishva/webapp/index.html)
+For demo see [http://ssatguru.appspot.com/babylonjs/Vishva/webapp0/index.html](http://ssatguru.appspot.com/babylonjs/Vishva/webapp0/index.html)
 
-Note: The above demo is a newer much enhanced version, the source code for which hasn't been uploaded yet. I will be uploading it soon though.
+This is about 6.4 MB. So give it a few seconds to download
+
+Here is a preview of a newer version of Vishva [http://ssatguru.appspot.com/babylonjs/Vishva/webapp/index.html](http://ssatguru.appspot.com/babylonjs/Vishva/webapp/index.html)
+
+This is about 8.6 MB. So give it a few seconds to download
+
+Note:This is still work in progress.The source code for this hasn't been uploaded yet. I will be uploading it soon though.
