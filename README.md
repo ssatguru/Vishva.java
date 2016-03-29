@@ -21,3 +21,5 @@ To run
 2. move your avatar using the "w a s d" keys. To run press shift and "w". Right click and drag mouse to look around. Click the "Vincent" or "Joan" button to swtich between male , female avatar.
 
 For demo see [http://ssatguru.appspot.com/babylonjs/Vishva/webapp/index.html](http://ssatguru.appspot.com/babylonjs/Vishva/webapp/index.html)
+
+Note: The above demo is a newer much enhanced version, the source code for which hasn't been uploaded yet. I will have it up soon though.
