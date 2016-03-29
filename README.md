@@ -22,4 +22,4 @@ To run
 
 For demo see [http://ssatguru.appspot.com/babylonjs/Vishva/webapp/index.html](http://ssatguru.appspot.com/babylonjs/Vishva/webapp/index.html)
 
-Note: The above demo is a newer much enhanced version, the source code for which hasn't been uploaded yet. I will have it up soon though.
+Note: The above demo is a newer much enhanced version, the source code for which hasn't been uploaded yet. I will be uploading it soon though.
