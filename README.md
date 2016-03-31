@@ -24,7 +24,7 @@ For demo see [http://ssatguru.appspot.com/babylonjs/Vishva/webapp0/index.html](h
 
 This is about 6.4 MB. So give it a few seconds to download
 
-Here is a preview of a newer version of Vishva as a live scene editor see [http://ssatguru.appspot.com/babylonjs/Vishva/webapp/index.html](http://ssatguru.appspot.com/babylonjs/Vishva/webapp/index.html)
+For a preview of a newer version of Vishva as a live scene editor, see [http://ssatguru.appspot.com/babylonjs/Vishva/webapp/index.html](http://ssatguru.appspot.com/babylonjs/Vishva/webapp/index.html)
 
 This is about 8.6 MB (or 3.4 MB GZIPed if your browser supports it) So give it a few seconds to download
 
