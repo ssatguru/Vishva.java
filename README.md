@@ -6,7 +6,7 @@ A simple live scene editor for [BabylonJS](http://www.babylonjs.com/) a 3D HTML 
 
 Developed in Java using [JSweet](http://www.jsweet.org/), a java to javscript transpiler
 
-## To run
+## to run
 
 * download project
 
@@ -14,7 +14,7 @@ Developed in Java using [JSweet](http://www.jsweet.org/), a java to javscript tr
 
 * move your avatar using the "w a s d" keys. To run press shift and "w". Right click and drag mouse to look around. 
 
-## To build
+## to build
 
 * download project, if you haven't already done so.
 
@@ -34,7 +34,7 @@ This is about 8.6 MB (or 3.4 MB GZIPed if your browser supports it) So give it a
 
 Note:This is still work in progress.
 
-## Build using
+## build using
 * [BabylonJS](http://www.babylonjs.com/)
 * [Java](https://www.oracle.com/java/index.html)
 * [JSweet](http://www.jsweet.org/)
