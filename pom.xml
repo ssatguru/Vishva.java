@@ -1,14 +1,15 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<groupId>org.ssatguru.babylonjs</groupId>
 	<artifactId>Vishva</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
-	<name>JSweet quick start</name>
-	
+	<version>0.2.0-SNAPSHOT</version>
+	<name>Vishva</name>
+
 	<description>A small babylonjs project written using JSweet</description>
-	
+
 	<developers>
 		<developer>
 			<id>ssatguru</id>
@@ -16,7 +17,7 @@
 			<email>ssatguru@gmail.com</email>
 		</developer>
 	</developers>
-	
+
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
@@ -24,21 +25,9 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-	
-	<pluginRepositories>
-		<pluginRepository>
-			<id>jsweet-plugins-release</id>
-			<name>plugins-release</name>
-			<url>http://repository.jsweet.org/artifactory/plugins-release-local</url>
-		</pluginRepository>
-		<pluginRepository>
-			<snapshots />
-			<id>jsweet-plugins-snapshots</id>
-			<name>plugins-snapshot</name>
-			<url>http://repository.jsweet.org/artifactory/plugins-snapshot-local</url>
-		</pluginRepository>
-	</pluginRepositories>
-	
+
+
+
 	<repositories>
 		<repository>
 			<id>jsweet-central</id>
@@ -52,10 +41,74 @@
 			<url>http://repository.jsweet.org/artifactory/libs-snapshot-local</url>
 		</repository>
 	</repositories>
-	
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.jsweet.candies</groupId>
+			<artifactId>jsweet-core</artifactId>
+			<version>1.1.0-SNAPSHOT</version> 
+			<!-- <version>1.1.0-20160326.220230-36</version>-->
+		</dependency>
+
+		<dependency>
+			<groupId>org.jsweet</groupId>
+			<artifactId>jsweet-transpiler</artifactId>
+			 <version>1.1.0-SNAPSHOT</version>
+			<!--<version>1.1.0-20160327.084440-62</version> -->
+		</dependency>
+
+		<dependency>
+			<groupId>org.jsweet.candies</groupId>
+			<artifactId>babylonjs--babylon</artifactId>
+			<version>2.3.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.ssatguru.babylonjs</groupId>
+			<artifactId>EditControl</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jsweet.candies</groupId>
+			<artifactId>jquery</artifactId>
+			<version>1.10.0-SNAPSHOT</version>
+		</dependency>
+		<!-- <dependency> <groupId>org.jsweet.candies</groupId> <artifactId>jquery</artifactId> 
+			<version>1.10.2</version> </dependency> -->
+		<dependency>
+			<groupId>org.jsweet.candies</groupId>
+			<artifactId>jqueryui</artifactId>
+			<version>1.9.0-SNAPSHOT</version>
+		</dependency>
+		<!-- <dependency> <groupId>org.jsweet.candies</groupId> <artifactId>jqueryui</artifactId> 
+			<version>1.9.0-1.0.0-20160202</version> </dependency> -->
+		<dependency>
+			<groupId>org.jsweet.candies</groupId>
+			<artifactId>zip.js</artifactId>
+			<version>2.0.0-SNAPSHOT</version>
+		</dependency>
+
+	</dependencies>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>jsweet-plugins-release</id>
+			<name>plugins-release</name>
+			<url>http://repository.jsweet.org/artifactory/plugins-release-local</url>
+		</pluginRepository>
+		<pluginRepository>
+			<snapshots />
+			<id>jsweet-plugins-snapshots</id>
+			<name>plugins-snapshot</name>
+			<url>http://repository.jsweet.org/artifactory/plugins-snapshot-local</url>
+		</pluginRepository>
+	</pluginRepositories>
+
 	<build>
 		<plugins>
-		
+
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
@@ -65,13 +118,13 @@
 					<fork>true</fork>
 				</configuration>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.jsweet</groupId>
 				<artifactId>jsweet-maven-plugin</artifactId>
-				<version>1.0.0-SNAPSHOT</version>
+				<version>1.1.0-SNAPSHOT</version>
 				<configuration>
-					<sourceMap>true</sourceMap>
+					<sourceMap>false</sourceMap>
 					<outDir>target/js</outDir>
 					<targetVersion>ES3</targetVersion>
 				</configuration>
@@ -85,9 +138,42 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
+
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.7</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/webapp/js</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/target/js</directory>
+									<includes>
+										<include>**/*.js</include>
+									</includes>
+								</resource>
+								<resource>
+									<directory>${basedir}/.ts</directory>
+									<includes>
+										<include>**/*.ts</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+
 		</plugins>
-		
+
 		<pluginManagement>
 			<plugins>
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
@@ -101,15 +187,9 @@
 							<pluginExecutions>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>
-											org.jsweet
-										</groupId>
-										<artifactId>
-											jsweet-maven-plugin
-										</artifactId>
-										<versionRange>
-											[1.0.0-SNAPSHOT,)
-										</versionRange>
+										<groupId>org.jsweet</groupId>
+										<artifactId>jsweet-maven-plugin</artifactId>
+										<versionRange>[1.0.0-RC1,)</versionRange>
 										<goals>
 											<goal>jsweet</goal>
 										</goals>
@@ -125,26 +205,6 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-	
-	<dependencies>
-	
-		<dependency>
-			<groupId>org.jsweet.candies</groupId>
-			<artifactId>jsweet-core</artifactId>
-			<version>1.0.2-SNAPSHOT</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.jsweet</groupId>
-			<artifactId>jsweet-transpiler</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
 
-		<dependency>
-			<groupId>org.jsweet.candies</groupId>
-			<artifactId>babylonjs--babylon</artifactId>
-			<version>2.2.2-SNAPSHOT</version>
-		</dependency>
 
-	</dependencies>
 </project>

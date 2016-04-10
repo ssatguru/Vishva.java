@@ -1,9 +1,28 @@
-
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
 <head>
+<meta charset="UTF-8">
+
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<meta name="Vishva" content="">
+<meta name="Satguru Srivatavaa" content="">
+<link rel="icon" href="../../favicon.ico">
+
 <title>Vishva</title>
-<script src="babylon.2.2.js"></script>
+
+<script src="lib/jquery-darkness-flat/jquery-2.2.0.min.js"></script>
+<script src="lib/jquery-darkness-flat/jquery-ui.min.js"></script>
+<link href="lib/jquery-darkness-flat/jquery-ui.min.css" rel="stylesheet">
+
+<script src="lib/babylon-03-23.js"></script>
+<script src="lib/babylon.waterMaterial.min.js"></script>
+<script src="lib/pep.0.4.1.min.js"></script>
+
+<link href="lib/colorpicker.themes.css" rel="stylesheet">
+<script type="text/javascript" src="lib/colorpicker.js"></script>
+
 <style>
 html, body {
 	width: 100%;
@@ -11,22 +30,329 @@ html, body {
 	padding: 0;
 	margin: 0;
 	overflow: hidden;
+	font: 80% "Trebuchet MS", sans-serif;
+	background:#000000;
 }
 
-#a {
+/* #sNaDiag */
+/* required as jquery dialog size does not adjust to content after it has been dragged */
+/*
+.ui-dialog {
+              height:auto !important;
+              width: auto !important;
+ }
+*/
+/* reduce the overlay for modal dialogs */
+.ui-widget-overlay {
+	opacity: 0.2;
+}
+
+.navMenu {
+	position: absolute;
+}
+
+.ui-menu {
+	width: 200px;
+}
+
+table {
+	border-radius: 10px;
+	background: red;
+}
+
+table, th, td {
+	border: 1px solid black;
+	padding: 5px;
+	padding-left: 15px;
+	padding-right: 15px;
+	border-collapse: collapse;
+}
+
+#vCanvas {
 	width: 100%;
 	height: 100%;
 }
 </style>
 
 </head>
-<body onload="">
-	<button id="Vincent">Vincent</button>
-	<button id="Joan">Joan</button>
+<body>
+	
+	<canvas id="vCanvas" oncontextmenu="return false;" tabindex="1"></canvas>
+	
+	<div style="padding: 4px;position: absolute; top: 0px; left: 0px">
+		<button id="showMenu" >&#9776;</button>
+	</div>
+	
+	 <div id="menubar"  style="padding: 4px;display: inline-block;position:absolute;">
+		<button id="downWorld">Save</button>
+		<button id="navAdd">Add</button>
+		<button id="navEnv">Environment</button>
+		<button id="navEdit">Edit</button>
+		<button id="helpLink">Help</button>
+		<button id="debugLink">Debug</button>
+	</div>
 
-	<canvas id="a" oncontextmenu="return false;"></canvas>
-	<script type="text/javascript"
-		src="../target/js/org/ssatguru/babylonjs/Vishva.js"></script>
+
+	<ul id="AddMenu" style="position:absolute;width:auto;">
+	</ul>
+
+	<div id="editDiv" title="Edit">
+		<ul id="editMenu">
+			<li id="swAv">Use as Avatar</li>
+			<li id="swGnd">Use as Ground</li>
+			<li id="downMesh">Download Mesh</li>
+			<!-- <li id="instMesh">Create Instance</li> -->
+			<li id="cloneMesh">Clone Mesh</li>
+			<li id="delMesh">Delete Mesh</li>
+			<li id="undo">Undo</li>
+			<li id="redo">Redo</li>
+			<li id="local">Switch to Global Axis</li>
+			<li id="sNa">Sensors & Actuators</li>
+			<li id="meshProps">Properties</li>
+		</ul>
+	</div>
+
+	<div id="sNaDiag">
+		<div id="sNaDetails">
+			<ul>
+				<li><a href="#sensors">Sensors</a></li>
+				<li><a href="#actuators">Actuators</a></li>
+			</ul>
+			<div id="sensors">
+				<button id="addSens">add</button>
+				<select id="sensSel" class="ui-widget-content ui-corner-all"></select>
+				<p>
+				<table id="sensTbl" style="text-align: center;">
+					<tr>
+						<td>name</td>
+						<td>signal</td>
+						<td>edit</td>
+						<td>del</td>
+					</tr>
+				</table>
+			</div>
+			<div id="actuators">
+				<button id="addAct">add</button>
+				<select id="actSel" class="ui-widget-content ui-corner-all"></select>
+				<p>
+				<table id="actTbl" style="text-align: center;">
+					<tr>
+						<td>name</td>
+						<td>signal</td>
+						<td>edit</td>
+						<td>del</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<div id="editSensDiag">
+		Sensor:<label id="editSensDiag.sensName">sensor name</label>
+		<p>Sensor Properties
+		<div id="editSensDiag.parms"></div>
+	</div>
+
+	<div id="editActDiag">
+		Actuator:<label id="editActDiag.actName">actuator name</label>
+		<p>Actuator Properties
+		<div id="editActDiag.parms"></div>
+	</div>
+
+	<div id="meshPropsDiag">
+		<div id="meshPropsTab">
+			<ul>
+				<li><a href="#transform">Transform</a></li>
+				<li><a href="#material">Materials</a></li>
+				<li><a href="#animations">Animations</a></li>
+			</ul>
+			<div id="transform">
+				<table>
+					<tr>
+						<td></td>
+						<td>x</td>
+						<td>y</td>
+						<td>z</td>
+					</tr>
+					<tr>
+						<td>location</td>
+						<td id="loc.x"></td>
+						<td id="loc.y"></td>
+						<td id="loc.z"></td>
+					</tr>
+					<tr>
+						<td>rotation</td>
+						<td id="rot.x"></td>
+						<td id="rot.y"></td>
+						<td id="rot.z"></td>
+					</tr>
+					<tr>
+						<td>scale</td>
+						<td id="scl.x"></td>
+						<td id="scl.y"></td>
+						<td id="scl.z"></td>
+					</tr>
+				</table>
+			</div>
+			<div id="material">TODO</div>
+			<div id="animations">
+				<table>
+					<tr>
+						<td>skeleton name</td>
+						<td>ranges</td>
+						<td>from frame</td>
+						<td>to frame</td>
+					</tr>
+					<tr>
+						<td id="skelName"></td>
+						<td><select id="animList"></select></td>
+						<td id="animFrom"></td>
+						<td id="animTo"></td>
+					</tr>
+				</table>
+				<br>
+				<table>
+					<tr>
+						<td>rate</td><td><input id="animRate" type="text" value="1" size="2"></td>
+					</tr>
+					<tr>
+						<td>loop</td><td><input type="checkbox" id="animLoop"></td>
+					</tr>
+					<tr>
+						<td><button id="playAnim">play</button></td>
+						<td><button id="stopAnim">stop</button></td>
+					</tr>
+				</table>
+ 
+			</div>
+		</div>
+
+
+		<div id="envDiv" title="Environment">
+			<table style="width: 100%; text-align: center;">
+				<tr>
+					<td>sun (west-east)</td>
+					<td><div id="sunPos"></div></td>
+				</tr>
+				<tr>
+					<td>light</td>
+					<td><div id="light"></div></td>
+				</tr>
+				<tr>
+					<td>shade</td>
+					<td><div id="shade"></div></td>
+				</tr>
+				<tr>
+					<td>fog</td>
+					<td><div id="fog"></div></td>
+				</tr>
+				<tr>
+					<td>fov</td>
+					<td><div id="fov"></div></td>
+				</tr>
+				<tr>
+					<td>sky</td>
+					<td><Button id="skyButton">Select Sky</button></td>
+				</tr>
+				<tr>
+					<td>terrain</td>
+					<td><Button id="terrain">Select Terrain</button></td>
+				</tr>
+				<tr>
+					<td>terrain color</td>
+					<td><div ondragstart="return false;" id="color-picker" class="cp-small"></div></td>
+				</tr>
+			</table>
+		</div>
+
+
+		<div id="saveDiv">
+			<br>Your file is ready for download.
+			<p>
+			<a id="downloadLink" href="www" download>Right click here and select "Save link as..." to save this file on your computer</a> <br> <br>
+		</div>
+
+		<div id="loadDiv">
+			<form id="fileLoadForm">
+				<input>Select File <input id="loadFileInput" type="file"></input>
+			</form>
+			<p>
+				<button id="loadFileOk">Load File</button>
+		</div>
+
+		<div id="alertDiv"></div>
+
+		<div id="helpDiv" title="Help">
+			<h4>Avatar Movement Keys</h4>
+			<ul>
+				<li>Turn left, right - press "A,D" or "left,right arrow" key or press and drag left mouse key
+				<li>Strafe left, right - press "Q,E" key
+				<li>Go forward, backward - press "W,S" or "up,down arrow" key
+				<li>Run - press "shift" key while going forward, backward
+				<li>Jump - press and release "space" key
+			</ul>
+			<h4>Item Edit Keys</h4>
+			<ul>
+				<li>To select item - right click the item,
+				<li>To unselect item - press"Esc" key
+				<li>To move,rotate or scale selected item -press "1,2,or 3" key
+				<li>To focus (center the camera)on selected item - press "F" key
+				<li>To zoom in or out of focused item - scroll mouse wheel forward or backward
+				<li>To pan around focused item - press "Ctrl" key and then press and drag mouse right key
+			</ul>
+		</div>
+
+		<script type="text/javascript" src="lib/EditControl.js"></script>
+		<script type="text/javascript" src="config.js"></script>
+		<script type="text/javascript" src="worlds.js"></script>
+		<script type="text/javascript" src="assets.js"></script>
+		<script type="text/javascript" src="js/org/ssatguru/babylonjs/VishvaGUI.js"></script>
+		<script type="text/javascript" src="js/org/ssatguru/babylonjs/Vishva.js"></script>
+		<script type="text/javascript" src="js/org/ssatguru/babylonjs/HREFsearch.js"></script>
+
+		<script type="text/javascript">
+			$(function() {
+
+				//change all buttons to jquery button
+				$("button").button();
+				$("button").click(function(e) {
+					$(this).blur();
+				});
+
+				var HREFsearch = org.ssatguru.babylonjs.HREFsearch;
+				var search = new HREFsearch();
+				
+				var  world,worldFolder,sceneFolder,sceneFile,editEnabled;
+				
+				world = search.getParm("world");
+				console.log(world);
+				if (!world){
+					if (config){
+						world=config.world;
+					}
+				}
+
+				if (worlds && world){
+					var worldData = worlds[world];
+					if (worldData){
+						worldFolder = worldData.worldFolder;
+						sceneFolder = worldData.sceneFolder;
+						sceneFile = worldData.sceneFile;
+						editEnabled = worldData.editEnabled;
+					}
+				}
+				
+
+				var scenePath = "vishva/worlds/" + worldFolder + "/"
+						+ sceneFolder + "/";
+				
+				if (editEnabled == null) editEnabled = true;
+				
+				var Vishva = org.ssatguru.babylonjs.Vishva;
+				console.log("scene " + sceneFile);
+				var vishva = new Vishva(scenePath, sceneFile,"vCanvas",editEnabled, assets );
+			});
+		</script>
 </body>
 
 </html>
