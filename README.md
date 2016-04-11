@@ -30,7 +30,6 @@ mvn generate-sources
 ## demo
 For a demo  see [http://ssatguru.appspot.com/BabylonJS-Vishva/webapp/index.html](http://ssatguru.appspot.com/BabylonJS-Vishva/webapp/index.html)
 
-This is about 8.6 MB (or 3.4 MB GZIPed if your browser supports it) So give it a few seconds to download
 
 Note:This is still work in progress.
 
