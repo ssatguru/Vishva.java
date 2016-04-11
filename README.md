@@ -12,7 +12,7 @@ Developed in Java using [JSweet](http://www.jsweet.org/), a java to javscript tr
 
 * cd to "webapp" folder. Open "index.html" in browser. If you are using firefox browser then you can open it directly from disk. For others you will have to serve the file via. some http server due to cross origin requests restrictions. See [here for some helpful information](https://github.com/mrdoob/three.js/wiki/How-to-run-things-locally)
 
-* move your avatar using the "w a s d" keys. To run press shift and "w". Right click and drag mouse to look around. 
+* move your avatar using the "w a s d q e" keys. To run press shift and "w". To jump press and release space key. Right click and drag mouse to look around. To select an item for edit, mouse right click the item. when selected use 1,2 ,3 and F keys to move,rotate,scale and focus on the item. To unslect an item press "esc" key.
 
 ## to build
 
