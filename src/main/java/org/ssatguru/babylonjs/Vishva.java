@@ -1208,16 +1208,11 @@ public class Vishva {
 				if (light.id == "Vishva.dl01") {
 					this.sunDR = (DirectionalLight) light;
 					this.shadowGenerator = light.getShadowGenerator();
-					// the following is not stored in scene file
+					// the following is not serialized in scene file
 					this.shadowGenerator.bias = 0.000001;
+					this.shadowGenerator.useBlurVarianceShadowMap = true;
 				}
 			}
-			/*
-			 * ShadowGenerator[] shadowGenerators = (ShadowGenerator[])
-			 * scene.$get("shadowGenerators"); this.shadowGenerator =
-			 * shadowGenerators[0]; //the following is not stored in scene file
-			 * this.shadowGenerator.bias = 0.000001;
-			 */
 		}
 
 		// check for main camera

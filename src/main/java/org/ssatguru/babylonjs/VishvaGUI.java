@@ -383,6 +383,12 @@ public class VishvaGUI {
 			foo.click();
 			return true;
 		};
+		
+		HTMLButtonElement trnButton = (HTMLButtonElement) document.getElementById("trnButton");
+		trnButton.onclick = (e) -> {
+			showAlertDiag("Sorry. To be implemneted soon");
+			return true;
+		};
 
 		HTMLElement colorEle = document.getElementById("color-picker");
 		ColorPicker cp = new ColorPicker(colorEle, this::colorPickerHandler);

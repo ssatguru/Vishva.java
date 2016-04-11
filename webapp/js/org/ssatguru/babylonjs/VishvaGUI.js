@@ -244,6 +244,11 @@ var org;
                         foo.click();
                         return true;
                     };
+                    var trnButton = document.getElementById("trnButton");
+                    trnButton.onclick = function (e) {
+                        _this.showAlertDiag("Sorry. To be implemneted soon");
+                        return true;
+                    };
                     var colorEle = document.getElementById("color-picker");
                     var cp = new ColorPicker(colorEle, function (hex, hsv, rgb) { return _this.colorPickerHandler(hex, hsv, rgb); });
                     var setRGB = cp["setRgb"];

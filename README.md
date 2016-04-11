@@ -38,5 +38,5 @@ Note:This is still work in progress.
 * [BabylonJS](http://www.babylonjs.com/)
 * [Java](https://www.oracle.com/java/index.html)
 * [JSweet](http://www.jsweet.org/)
-* [JQuery UI] (https://jqueryui.com/)
+* [JQuery UI](https://jqueryui.com/)
 * [FlexiColorPicker](https://github.com/DavidDurman/FlexiColorPicker)
