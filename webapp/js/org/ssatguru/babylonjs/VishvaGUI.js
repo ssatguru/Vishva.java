@@ -654,7 +654,7 @@ var org;
                     dos.modal = false;
                     dos.resizable = false;
                     dos.width = 450;
-                    dos.height = "280";
+                    dos.height = "300";
                     dos.title = "Mesh Properties";
                     dos.close = function (e, ui) {
                         _this.vishva.switchDisabled = false;

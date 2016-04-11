@@ -63,6 +63,7 @@ import jsweet.dom.Event;
 import jsweet.dom.File;
 import jsweet.dom.FileReader;
 import jsweet.dom.HTMLCanvasElement;
+import jsweet.dom.HTMLElement;
 import jsweet.dom.KeyboardEvent;
 import jsweet.dom.PointerEvent;
 import jsweet.dom.URL;
@@ -119,6 +120,8 @@ public class Vishva {
 	AnimData prevAnim = null;
 
 	Key key;
+	
+	HTMLElement loadingMsg ;
 
 	// options
 	boolean showBoundingBox = false;
@@ -130,6 +133,8 @@ public class Vishva {
 			alert("not supported");
 			return;
 		}
+		
+		this.loadingMsg = document.getElementById("loadingMsg");
 		
 		this.editEnabled=editEnabled;
 
@@ -149,7 +154,7 @@ public class Vishva {
 		this.scenePath = scenePath;
 		this.sceneFile = sceneFile;
 		
-		this.engine.hideLoadingUI();
+		//this.engine.hideLoadingUI();
 		
 		if (sceneFile == null) {
 			onSceneLoaded(this.scene);
@@ -1401,6 +1406,7 @@ public class Vishva {
 			vishvaGUI = null;
 		}
 		this.engine.hideLoadingUI();
+		this.loadingMsg.parentNode.removeChild(this.loadingMsg);
 		this.engine.runRenderLoop(() -> this.scene.render());
 	}
 

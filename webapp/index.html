@@ -31,7 +31,8 @@ html, body {
 	margin: 0;
 	overflow: hidden;
 	font: 80% "Trebuchet MS", sans-serif;
-	background:#000000;
+	background: #000000;
+	color: #ffffff;
 }
 
 /* #sNaDiag */
@@ -76,14 +77,30 @@ table, th, td {
 
 </head>
 <body>
-	
-	<canvas id="vCanvas" oncontextmenu="return false;" tabindex="1"></canvas>
-	
-	<div style="padding: 4px;position: absolute; top: 0px; left: 0px">
-		<button id="showMenu" >&#9776;</button>
+	<div id="loadingMsg" style="
+	text-align:center;
+    display: inline-block;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 200px;
+    height: 100px;
+    margin: auto;">
+		<h1 >loading</h1>
+		<br>
+		<h1> please wait</h1>
 	</div>
-	
-	 <div id="menubar"  style="padding: 4px;display: inline-block;position:absolute;">
+
+	</div>
+	<canvas id="vCanvas" oncontextmenu="return false;" tabindex="1"></canvas>
+
+	<div style="padding: 4px; position: absolute; top: 0px; left: 0px">
+		<button id="showMenu">&#9776;</button>
+	</div>
+
+	<div id="menubar" style="padding: 4px; display: inline-block; position: absolute;">
 		<button id="downWorld">Save</button>
 		<button id="navAdd">Add</button>
 		<button id="navEnv">Environment</button>
@@ -93,7 +110,7 @@ table, th, td {
 	</div>
 
 
-	<ul id="AddMenu" style="position:absolute;width:auto;">
+	<ul id="AddMenu" style="position: absolute; width: auto;">
 	</ul>
 
 	<div id="editDiv" title="Edit">
@@ -213,17 +230,19 @@ table, th, td {
 				<br>
 				<table>
 					<tr>
-						<td>rate</td><td><input id="animRate" type="text" value="1" size="2"></td>
+						<td>rate</td>
+						<td><input id="animRate" type="text" value="1" size="2"></td>
 					</tr>
 					<tr>
-						<td>loop</td><td><input type="checkbox" id="animLoop"></td>
+						<td>loop</td>
+						<td><input type="checkbox" id="animLoop"></td>
 					</tr>
 					<tr>
 						<td><button id="playAnim">play</button></td>
 						<td><button id="stopAnim">stop</button></td>
 					</tr>
 				</table>
- 
+
 			</div>
 		</div>
 
@@ -269,7 +288,7 @@ table, th, td {
 		<div id="saveDiv">
 			<br>Your file is ready for download.
 			<p>
-			<a id="downloadLink" href="www" download>Right click here and select "Save link as..." to save this file on your computer</a> <br> <br>
+				<a id="downloadLink" href="www" download>Right click here and select "Save link as..." to save this file on your computer</a> <br> <br>
 		</div>
 
 		<div id="loadDiv">
@@ -321,36 +340,37 @@ table, th, td {
 
 				var HREFsearch = org.ssatguru.babylonjs.HREFsearch;
 				var search = new HREFsearch();
-				
-				var  world,worldFolder,sceneFolder,sceneFile,editEnabled;
-				
+
+				var world, worldFolder, sceneFolder, sceneFile, editEnabled;
+
 				world = search.getParm("world");
 				console.log(world);
-				if (!world){
-					if (config){
-						world=config.world;
+				if (!world) {
+					if (config) {
+						world = config.world;
 					}
 				}
 
-				if (worlds && world){
+				if (worlds && world) {
 					var worldData = worlds[world];
-					if (worldData){
+					if (worldData) {
 						worldFolder = worldData.worldFolder;
 						sceneFolder = worldData.sceneFolder;
 						sceneFile = worldData.sceneFile;
 						editEnabled = worldData.editEnabled;
 					}
 				}
-				
 
 				var scenePath = "vishva/worlds/" + worldFolder + "/"
 						+ sceneFolder + "/";
-				
-				if (editEnabled == null) editEnabled = true;
-				
+
+				if (editEnabled == null)
+					editEnabled = true;
+
 				var Vishva = org.ssatguru.babylonjs.Vishva;
 				console.log("scene " + sceneFile);
-				var vishva = new Vishva(scenePath, sceneFile,"vCanvas",editEnabled, assets );
+				var vishva = new Vishva(scenePath, sceneFile, "vCanvas",
+						editEnabled, assets);
 			});
 		</script>
 </body>

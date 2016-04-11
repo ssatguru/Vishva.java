@@ -69,6 +69,7 @@ var org;
                         alert("not supported");
                         return;
                     }
+                    this.loadingMsg = document.getElementById("loadingMsg");
                     this.editEnabled = editEnabled;
                     this.assets = assets;
                     this.key = new Key();
@@ -81,7 +82,6 @@ var org;
                     window.addEventListener("keyup", function (e) { return _this.onKeyUp(e); }, false);
                     this.scenePath = scenePath;
                     this.sceneFile = sceneFile;
-                    this.engine.hideLoadingUI();
                     if (sceneFile == null) {
                         this.onSceneLoaded(this.scene);
                     }
@@ -1055,6 +1055,7 @@ var org;
                         this.vishvaGUI = null;
                     }
                     this.engine.hideLoadingUI();
+                    this.loadingMsg.parentNode.removeChild(this.loadingMsg);
                     this.engine.runRenderLoop(function () { return _this.scene.render(); });
                 };
                 Vishva.prototype.process = function () {

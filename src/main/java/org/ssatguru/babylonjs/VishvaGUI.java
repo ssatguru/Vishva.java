@@ -950,7 +950,7 @@ public class VishvaGUI {
 		dos.modal = false;
 		dos.resizable = false;
 		dos.width = 450;
-		dos.height=union("280");
+		dos.height=union("300");
 		dos.title = "Mesh Properties";
 		dos.close = (e, ui) -> {
 			this.vishva.switchDisabled = false;
