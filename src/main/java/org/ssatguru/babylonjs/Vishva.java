@@ -450,7 +450,17 @@ public class Vishva {
 			return "no mesh selected";
 		}
 		removeEditControl();
+		
+		//remove all sensors and actuators asscoiated with this mesh
 		SNAManager.getSNAManager().removeSNAs(this.meshPicked);
+		
+		//remove this mesh from the shadow generator map 
+		Array<AbstractMesh> meshes = Globals.array(this.shadowGenerator.getShadowMap().renderList);
+		double i = meshes.indexOf(this.meshPicked);
+		if (i >=0){
+			meshes.splice(i,1);
+		}
+		
 		this.meshPicked.dispose();
 		return null;
 
@@ -821,9 +831,10 @@ public class Vishva {
 		// if (textureName.substring(0, 2) != "..") {
 		// sm.reflectionTexture.name = "../../../" + textureName;
 		// }
+		
 		jsweet.lang.Object snaObj = SNAManager.getSNAManager().serializeSnAs(this.scene);
 		String snaObjStr = JSON.stringify(snaObj);
-
+		
 		jsweet.lang.Object sceneObj = (jsweet.lang.Object) SceneSerializer.Serialize(this.scene);
 		sceneObj.$set("VishvaSNA", snaObj);
 		String sceneString = JSON.stringify(sceneObj);
