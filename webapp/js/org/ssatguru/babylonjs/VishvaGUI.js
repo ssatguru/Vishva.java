@@ -80,8 +80,8 @@ var org;
                  * @param evt
                  */
                 VishvaGUI.prototype.onWindowResize = function (evt) {
-                    for (var index152 = 0; index152 < this.dialogs.length; index152++) {
-                        var jq = this.dialogs[index152];
+                    for (var index153 = 0; index153 < this.dialogs.length; index153++) {
+                        var jq = this.dialogs[index153];
                         {
                             var jpo = jq["jpo"];
                             if (jpo != null) {
@@ -100,8 +100,8 @@ var org;
                     var assetTypes = Object.keys(this.vishva.assets);
                     var addMenu = document.getElementById("AddMenu");
                     var f = function (e) { return _this.onAddMenuItemClick(e); };
-                    for (var index153 = 0; index153 < assetTypes.length; index153++) {
-                        var assetType = assetTypes[index153];
+                    for (var index154 = 0; index154 < assetTypes.length; index154++) {
+                        var assetType = assetTypes[index154];
                         {
                             if (assetType == "sounds") {
                                 continue;
@@ -155,8 +155,8 @@ var org;
                     }
                     var f = function (e) { return _this.onAssetImgClick(e); };
                     var row = tbl.insertRow();
-                    for (var index154 = 0; index154 < items.length; index154++) {
-                        var item = items[index154];
+                    for (var index155 = 0; index155 < items.length; index155++) {
+                        var item = items[index155];
                         {
                             var img = document.createElement("img");
                             img.id = item;
@@ -170,8 +170,8 @@ var org;
                         }
                     }
                     var row2 = tbl.insertRow();
-                    for (var index155 = 0; index155 < items.length; index155++) {
-                        var item = items[index155];
+                    for (var index156 = 0; index156 < items.length; index156++) {
+                        var item = items[index156];
                         {
                             var cell = row2.insertCell();
                             cell.innerText = item;
@@ -290,8 +290,8 @@ var org;
                                 return null;
                             }
                             var file = null;
-                            for (var index156 = 0; index156 < fl.length; index156++) {
-                                var f = fl[index156];
+                            for (var index157 = 0; index157 < fl.length; index157++) {
+                                var f = fl[index157];
                                 {
                                     file = f;
                                 }
@@ -334,8 +334,8 @@ var org;
                     this.actSel = document.getElementById("actSel");
                     var sensors = this.vishva.getSensorList();
                     var actuators = this.vishva.getActuatorList();
-                    for (var index157 = 0; index157 < sensors.length; index157++) {
-                        var sensor = sensors[index157];
+                    for (var index158 = 0; index158 < sensors.length; index158++) {
+                        var sensor = sensors[index158];
                         {
                             var opt = document.createElement("option");
                             opt.value = sensor;
@@ -343,8 +343,8 @@ var org;
                             this.sensSel.add(opt);
                         }
                     }
-                    for (var index158 = 0; index158 < actuators.length; index158++) {
-                        var actuator = actuators[index158];
+                    for (var index159 = 0; index159 < actuators.length; index159++) {
+                        var actuator = actuators[index159];
                         {
                             var opt = document.createElement("option");
                             opt.value = actuator;
@@ -523,8 +523,8 @@ var org;
                     idPrefix = idPrefix + ".";
                     var tbl = document.createElement("table");
                     var keys = Object.keys(snap);
-                    for (var index159 = 0; index159 < keys.length; index159++) {
-                        var key = keys[index159];
+                    for (var index160 = 0; index160 < keys.length; index160++) {
+                        var key = keys[index160];
                         {
                             var row = tbl.insertRow();
                             var cell = row.insertCell();
@@ -537,8 +537,8 @@ var org;
                                 var options = keyValue.values;
                                 var sel = document.createElement("select");
                                 sel.id = idPrefix + key;
-                                for (var index160 = 0; index160 < options.length; index160++) {
-                                    var option = options[index160];
+                                for (var index161 = 0; index161 < options.length; index161++) {
+                                    var option = options[index161];
                                     {
                                         var opt = document.createElement("option");
                                         if (option == keyValue.value) {
@@ -582,8 +582,8 @@ var org;
                 VishvaGUI.prototype.readForm = function (snap, idPrefix) {
                     idPrefix = idPrefix + ".";
                     var keys = Object.keys(snap);
-                    for (var index161 = 0; index161 < keys.length; index161++) {
-                        var key = keys[index161];
+                    for (var index162 = 0; index162 < keys.length; index162++) {
+                        var key = keys[index162];
                         {
                             var t = typeof snap[key];
                             if ((t == "object") && (snap[key] instanceof org.ssatguru.babylonjs.SelectType)) {
@@ -696,8 +696,8 @@ var org;
                     if (skelName != null) {
                         var range = this.vishva.getAnimationRanges();
                         var animOpt;
-                        for (var index162 = 0; index162 < range.length; index162++) {
-                            var ar = range[index162];
+                        for (var index163 = 0; index163 < range.length; index163++) {
+                            var ar = range[index163];
                             {
                                 animOpt = document.createElement("option");
                                 animOpt.value = ar.name;

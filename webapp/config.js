@@ -2,5 +2,5 @@
  * 
  */
 config={
-	
+	"world":"demo"
 };

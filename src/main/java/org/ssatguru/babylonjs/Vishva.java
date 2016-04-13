@@ -1961,7 +1961,7 @@ class SNAManager {
 	jsweet.lang.Object sensors;
 	jsweet.lang.Object actuators;
 	String[] sensorList = new String[] { "Touch" };
-	String[] actuatorList = new String[] { "Mover", "Rotator", "Sound" };
+	String[] actuatorList = new String[] { "Animator","Mover", "Rotator", "Sound" };
 
 	//
 	Array<AbstractMesh> snaDisabledList = new Array();
@@ -1998,6 +1998,8 @@ class SNAManager {
 	}
 
 	// should make these ...byName() more generic
+	// during scene load properties are unmarshalled from scenefile and passed 
+	// during initial creration properties are null
 	public Sensor createSensorByName(String name, Mesh mesh, SNAproperties prop) {
 		if (name == "Touch") {
 			if (prop != null)
@@ -2008,6 +2010,8 @@ class SNAManager {
 		return null;
 	}
 
+	// during scene load properties are unmarshalled from scenefile and passed 
+	// during initial creation properties are null
 	public Actuator createActuatorByName(String name, Mesh mesh, SNAproperties prop) {
 		if (name == "Mover") {
 			if (prop != null)
@@ -2024,6 +2028,11 @@ class SNAManager {
 				return new ActuatorSound(mesh, (ActSoundProp) prop);
 			else
 				return new ActuatorSound(mesh, new ActSoundProp());
+		}else if (name == "Animator") {
+			if (prop != null)
+				return new ActuatorAnimator(mesh, (AnimatorProp) prop);
+			else
+				return new ActuatorAnimator(mesh, new AnimatorProp());
 		}
 		return null;
 	}
@@ -2760,13 +2769,67 @@ class ActuatorMover extends ActuatorAbstract {
 
 }
 
+class ActuatorAnimator extends ActuatorAbstract{
+
+	public ActuatorAnimator(Mesh mesh, AnimatorProp prop) {
+		super(mesh, prop);
+		Skeleton skel = mesh.skeleton;
+		if (skel != null){
+			Function getAnimationRanges =  (Function) skel.$get("getAnimationRanges");
+			AnimationRange[] ranges = (AnimationRange[]) getAnimationRanges.call(skel);
+			String[] animNames = new String[ranges.length];
+			int i =0;
+			for (AnimationRange range:ranges){
+				animNames[i]=  range.name;
+				i++;
+			}
+			prop.animationRange.values = animNames;
+		}
+	}
+
+	@Override
+	public void actuate() {
+		AnimatorProp prop = (AnimatorProp) this.properties;
+		this.mesh.skeleton.beginAnimation(prop.animationRange.value,prop.loop,prop.rate,this::onActuateEnd);
+	}
+
+	@Override
+	public void stop() {
+		
+	}
+
+	@Override
+	public boolean isReady() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return "Animator";
+	}
+
+	@Override
+	public void processUpdateSpecific() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void cleanUp() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+}
+
 class ActuatorSound extends ActuatorAbstract {
 
 	Sound sound;
 
 	public ActuatorSound(Mesh mesh, ActSoundProp prop) {
 		super(mesh, prop);
-		// this.properties = prop;
 	}
 
 	@Override
@@ -2845,11 +2908,12 @@ class ActuatorSound extends ActuatorAbstract {
 
 abstract class SNAproperties extends jsweet.lang.Object {
 	String signalId = "0";
-
+	
 	public abstract SNAproperties unmarshall(jsweet.lang.Object obj);
 }
 
 class SenTouchProp extends SNAproperties {
+
 
 	@Override
 	public SenTouchProp unmarshall(jsweet.lang.Object obj) {
@@ -2860,25 +2924,32 @@ class SenTouchProp extends SNAproperties {
 }
 
 abstract class ActProperties extends SNAproperties {
+	
+
 	boolean autoStart = false;
 	boolean loop = false;
 	boolean toggle = true;
 	String startSigId = "";
 	String endSigId = "";
-
+	
+	
 	@Override
 	public abstract ActProperties unmarshall(jsweet.lang.Object obj);
 }
 
 class ActRotatorParm extends ActProperties {
+	
+
 	double x = 0;
 	double y = 90;
 	double z = 0;
 	double duration = 1;
 
+
 	//
-	// TODO:always loacl for now. provide a way to do global rotate
+	// TODO:always local for now. provide a way to do global rotate
 	// boolean local = false;
+	
 	@Override
 	public ActRotatorParm unmarshall(jsweet.lang.Object obj) {
 		// TODO Auto-generated method stub
@@ -2887,23 +2958,46 @@ class ActRotatorParm extends ActProperties {
 }
 
 class ActMoverParm extends ActProperties {
+	
+
 	double x = 1;
 	double y = 1;
 	double z = 1;
 	double duration = 1;
 	boolean local = false;
+	
+
 
 	@Override
 	public ActMoverParm unmarshall(jsweet.lang.Object obj) {
-		// TODO Auto-generated method stub
 		return (ActMoverParm) obj;
 	}
 }
 
+class AnimatorProp extends ActProperties {
+	
+	
+
+	SelectType animationRange = new SelectType();
+	double rate=1;
+	
+
+
+	@Override
+	public ActProperties unmarshall(jsweet.lang.Object obj) {
+		
+		return null;
+	}
+	
+}
+
 class ActSoundProp extends ActProperties {
+
 	SelectType soundFile = new SelectType();
 	boolean attachToMesh = false;
 	Range volume = new Range(0.0, 1.0, 1.0, 0.1);
+	
+	
 
 	public ActSoundProp unmarshall(jsweet.lang.Object obj) {
 		ActSoundProp inObj = (ActSoundProp) obj;

@@ -1466,7 +1466,7 @@ var org;
             var SNAManager = (function () {
                 function SNAManager() {
                     this.sensorList = ["Touch"];
-                    this.actuatorList = ["Mover", "Rotator", "Sound"];
+                    this.actuatorList = ["Animator", "Mover", "Rotator", "Sound"];
                     this.snaDisabledList = new Array();
                     this.sig2actMap = new Object();
                 }
@@ -1515,6 +1515,12 @@ var org;
                             return new ActuatorSound(mesh, prop);
                         else
                             return new ActuatorSound(mesh, new ActSoundProp());
+                    }
+                    else if (name == "Animator") {
+                        if (prop != null)
+                            return new ActuatorAnimator(mesh, prop);
+                        else
+                            return new ActuatorAnimator(mesh, new AnimatorProp());
                     }
                     return null;
                 };
@@ -2039,6 +2045,47 @@ var org;
                 return ActuatorMover;
             })(ActuatorAbstract);
             babylonjs.ActuatorMover = ActuatorMover;
+            var ActuatorAnimator = (function (_super) {
+                __extends(ActuatorAnimator, _super);
+                function ActuatorAnimator(mesh, prop) {
+                    _super.call(this, mesh, prop);
+                    Object.defineProperty(this, '__interfaces', { configurable: true, value: ["org.ssatguru.babylonjs.SensorActuator", "org.ssatguru.babylonjs.Actuator"] });
+                    var skel = mesh.skeleton;
+                    if (skel != null) {
+                        var getAnimationRanges = skel["getAnimationRanges"];
+                        var ranges = getAnimationRanges.call(skel);
+                        var animNames = new Array(ranges.length);
+                        var i = 0;
+                        for (var index152 = 0; index152 < ranges.length; index152++) {
+                            var range = ranges[index152];
+                            {
+                                animNames[i] = range.name;
+                                i++;
+                            }
+                        }
+                        prop.animationRange.values = animNames;
+                    }
+                }
+                ActuatorAnimator.prototype.actuate = function () {
+                    var _this = this;
+                    var prop = this.properties;
+                    this.mesh.skeleton.beginAnimation(prop.animationRange.value, prop.loop, prop.rate, function () { return _this.onActuateEnd(); });
+                };
+                ActuatorAnimator.prototype.stop = function () {
+                };
+                ActuatorAnimator.prototype.isReady = function () {
+                    return false;
+                };
+                ActuatorAnimator.prototype.getName = function () {
+                    return "Animator";
+                };
+                ActuatorAnimator.prototype.processUpdateSpecific = function () {
+                };
+                ActuatorAnimator.prototype.cleanUp = function () {
+                };
+                return ActuatorAnimator;
+            })(ActuatorAbstract);
+            babylonjs.ActuatorAnimator = ActuatorAnimator;
             var ActuatorSound = (function (_super) {
                 __extends(ActuatorSound, _super);
                 function ActuatorSound(mesh, prop) {
@@ -2167,6 +2214,19 @@ var org;
                 return ActMoverParm;
             })(ActProperties);
             babylonjs.ActMoverParm = ActMoverParm;
+            var AnimatorProp = (function (_super) {
+                __extends(AnimatorProp, _super);
+                function AnimatorProp() {
+                    _super.apply(this, arguments);
+                    this.animationRange = new babylonjs.SelectType();
+                    this.rate = 1;
+                }
+                AnimatorProp.prototype.unmarshall = function (obj) {
+                    return null;
+                };
+                return AnimatorProp;
+            })(ActProperties);
+            babylonjs.AnimatorProp = AnimatorProp;
             var ActSoundProp = (function (_super) {
                 __extends(ActSoundProp, _super);
                 function ActSoundProp() {
