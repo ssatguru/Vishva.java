@@ -3,6 +3,6 @@ var worlds={
 			"worldFolder":"demos",
 			"sceneFolder":"demo1",
 			"sceneFile":"demo",
-			"editEnabled":"true"
+			"editEnabled":true
 		}
 };
