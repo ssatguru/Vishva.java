@@ -20,7 +20,7 @@ More info at [http://ssatguru.appspot.com/BabylonJS-Vishva/intro.html](http://ss
 
 ## to build
 
-* this project has a dependency on the [EditControl Artifact](https://github.com/ssatguru/BabylonJS-EditControl). Download, build and install that in your local Maven repository/
+* this project has a dependency on the [EditControl Artifact](https://github.com/ssatguru/BabylonJS-EditControl). Download, build and install that in your local Maven repository.
 
 * download this project, if you haven't already done so.
 
