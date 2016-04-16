@@ -33,6 +33,7 @@ More info at [http://ssatguru.appspot.com/BabylonJS-Vishva/intro.html](http://ss
 mvn generate-sources
 ```
 * this will generate all the javascript and typescript file under webapp/js folder
+* 
 * to clean
 ```
 mvn clean jsweet:clean
