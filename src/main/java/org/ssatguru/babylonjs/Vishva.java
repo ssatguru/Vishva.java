@@ -122,6 +122,7 @@ public class Vishva {
 	Key key;
 
 	HTMLElement loadingMsg;
+	HTMLElement loadingStatus;
 
 	// options
 	boolean showBoundingBox = false;
@@ -135,6 +136,7 @@ public class Vishva {
 		}
 
 		this.loadingMsg = document.getElementById("loadingMsg");
+		this.loadingStatus = document.getElementById("loadingStatus");
 
 		this.editEnabled = editEnabled;
 
@@ -159,6 +161,7 @@ public class Vishva {
 		if (sceneFile == null) {
 			onSceneLoaded(this.scene);
 		} else {
+			this.loadingStatus.innerHTML="downloading world";
 			loadSceneFile(scenePath, sceneFile + ".js", this.scene);
 		}
 
@@ -183,6 +186,7 @@ public class Vishva {
 		snas = (SNAserialized[]) foo.$get("VishvaSNA");
 		String sceneData = "data:" + tfat.text;
 		SceneLoader.ShowLoadingScreen = false;
+		this.loadingStatus.innerHTML="loading scene";
 		SceneLoader.Append(this.scenePath, sceneData, this.scene, this::onSceneLoaded);
 	}
 
@@ -1154,13 +1158,15 @@ public class Vishva {
 	ShadowGenerator shadowGenerator;
 
 	private void onSceneLoaded(Scene scene) {
-
+		this.loadingStatus.innerHTML="checking assets";
+		
 		boolean avFound = false;
 		boolean skelFound = false;
 		boolean sunFound = false;
 		boolean groundFound = false;
 		boolean skyFound = false;
 		boolean cameraFound = false;
+
 
 		for (AbstractMesh mesh : scene.meshes) {
 
@@ -1181,6 +1187,7 @@ public class Vishva {
 
 			}
 		}
+
 
 		for (Skeleton skeleton : scene.skeletons) {
 			// bug? skeleton tags not supported
@@ -1409,6 +1416,7 @@ public class Vishva {
 	}
 
 	private void startRenderLoop() {
+
 		backfaceCulling(this.scene.materials);
 		if (this.editEnabled) {
 			vishvaGUI = new VishvaGUI(this);
@@ -1416,7 +1424,8 @@ public class Vishva {
 			vishvaGUI = null;
 		}
 		this.engine.hideLoadingUI();
-		this.loadingMsg.parentNode.removeChild(this.loadingMsg);
+		this.loadingMsg.style.visibility = "hidden";
+		//this.loadingMsg.parentNode.removeChild(this.loadingMsg);
 		this.engine.runRenderLoop(() -> this.scene.render());
 	}
 
@@ -1541,12 +1550,12 @@ public class Vishva {
 				this.key.jump = false;
 		} else if (this.key.stepLeft) {
 			anim = this.strafeLeft;
-			stepLeft = this.avatar.calcMovePOV(-this.avatarSpeed / 2, 0, 0);
+			stepLeft = this.avatar.calcMovePOV(-this.avatarSpeed / 2, -upSpeed * dir, 0);
 			this.avatar.moveWithCollisions(stepLeft);
 			moving = true;
 		} else if (this.key.stepRight) {
 			anim = this.strafeRight;
-			stepRight = this.avatar.calcMovePOV(this.avatarSpeed / 2, 0, 0);
+			stepRight = this.avatar.calcMovePOV(this.avatarSpeed / 2,-upSpeed * dir, 0);
 			this.avatar.moveWithCollisions(stepRight);
 			moving = true;
 		}

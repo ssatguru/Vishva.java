@@ -77,30 +77,20 @@ table, th, td {
 
 </head>
 <body>
-	<div id="loadingMsg" style="
-	text-align:center;
-    display: inline-block;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 200px;
-    height: 100px;
-    margin: auto;">
-		<h1 >loading</h1>
+
+	<div id="loadingMsg"
+		style="text-align: center; display: inline-block; position: fixed; top: 0; bottom: 0; left: 0; right: 0; width: 200px; height: 100px; margin: auto;">
+		<h1>loading</h1>
+		<h1>please wait</h1>
 		<br>
-		<h1> please wait</h1>
+		<h2 id="loadingStatus">...</h2>
 	</div>
 
-	</div>
-	<canvas id="vCanvas" oncontextmenu="return false;" tabindex="1"></canvas>
-
-	<div style="padding: 4px; position: absolute; top: 0px; left: 0px">
+	<div style="padding: 4px; position: absolute; top: 0px; left: 0px; visibility:hidden">
 		<button id="showMenu">&#9776;</button>
 	</div>
 
-	<div id="menubar" style="padding: 4px; display: inline-block; position: absolute;">
+	<div id="menubar" style="padding: 4px; display: inline-block; position: absolute;visibility:hidden">
 		<button id="downWorld">Save</button>
 		<button id="navAdd">Add</button>
 		<button id="navEnv">Environment</button>
@@ -109,7 +99,8 @@ table, th, td {
 		<button id="debugLink">Debug</button>
 	</div>
 
-
+	<canvas id="vCanvas" oncontextmenu="return false;" tabindex="1"></canvas>
+	
 	<ul id="AddMenu" style="position: absolute; width: auto;">
 	</ul>
 
@@ -245,133 +236,133 @@ table, th, td {
 
 			</div>
 		</div>
+	</div>
+
+	<div id="envDiv" title="Environment">
+		<table style="width: 100%; text-align: center;">
+			<tr>
+				<td>sun (west-east)</td>
+				<td><div id="sunPos"></div></td>
+			</tr>
+			<tr>
+				<td>light</td>
+				<td><div id="light"></div></td>
+			</tr>
+			<tr>
+				<td>shade</td>
+				<td><div id="shade"></div></td>
+			</tr>
+			<tr>
+				<td>fog</td>
+				<td><div id="fog"></div></td>
+			</tr>
+			<tr>
+				<td>fov</td>
+				<td><div id="fov"></div></td>
+			</tr>
+			<tr>
+				<td>sky</td>
+				<td><Button id="skyButton">Select Sky</button></td>
+			</tr>
+			<tr>
+				<td>terrain</td>
+				<td><Button id="trnButton">Select Terrain</button></td>
+			</tr>
+			<tr>
+				<td>terrain color</td>
+				<td><div ondragstart="return false;" id="color-picker" class="cp-small"></div></td>
+			</tr>
+		</table>
+	</div>
 
 
-		<div id="envDiv" title="Environment">
-			<table style="width: 100%; text-align: center;">
-				<tr>
-					<td>sun (west-east)</td>
-					<td><div id="sunPos"></div></td>
-				</tr>
-				<tr>
-					<td>light</td>
-					<td><div id="light"></div></td>
-				</tr>
-				<tr>
-					<td>shade</td>
-					<td><div id="shade"></div></td>
-				</tr>
-				<tr>
-					<td>fog</td>
-					<td><div id="fog"></div></td>
-				</tr>
-				<tr>
-					<td>fov</td>
-					<td><div id="fov"></div></td>
-				</tr>
-				<tr>
-					<td>sky</td>
-					<td><Button id="skyButton">Select Sky</button></td>
-				</tr>
-				<tr>
-					<td>terrain</td>
-					<td><Button id="trnButton">Select Terrain</button></td>
-				</tr>
-				<tr>
-					<td>terrain color</td>
-					<td><div ondragstart="return false;" id="color-picker" class="cp-small"></div></td>
-				</tr>
-			</table>
-		</div>
+	<div id="saveDiv">
+		<br>Your file is ready for download.
+		<p>
+			<a id="downloadLink" href="www" download>Right click here and select "Save link as..." to save this file on your computer</a> <br> <br>
+	</div>
 
+	<div id="loadDiv">
+		<form id="fileLoadForm">
+			<input>Select File <input id="loadFileInput" type="file"></input>
+		</form>
+		<p>
+			<button id="loadFileOk">Load File</button>
+	</div>
 
-		<div id="saveDiv">
-			<br>Your file is ready for download.
-			<p>
-				<a id="downloadLink" href="www" download>Right click here and select "Save link as..." to save this file on your computer</a> <br> <br>
-		</div>
+	<div id="alertDiv"></div>
 
-		<div id="loadDiv">
-			<form id="fileLoadForm">
-				<input>Select File <input id="loadFileInput" type="file"></input>
-			</form>
-			<p>
-				<button id="loadFileOk">Load File</button>
-		</div>
+	<div id="helpDiv" title="Help">
+		<h4>Avatar Movement Keys</h4>
+		<ul>
+			<li>Turn left, right - press "A,D" or "left,right arrow" key or press and drag left mouse key
+			<li>Strafe left, right - press "Q,E" key
+			<li>Go forward, backward - press "W,S" or "up,down arrow" key
+			<li>Run - press "shift" key while going forward, backward
+			<li>Jump - press and release "space" key
+		</ul>
+		<h4>Item Edit Keys</h4>
+		<ul>
+			<li>To select item - right click the item,
+			<li>To unselect item - press"Esc" key
+			<li>To move,rotate or scale selected item -press "1,2,or 3" key
+			<li>To focus (center the camera)on selected item - press "F" key
+			<li>To zoom in or out of focused item - scroll mouse wheel forward or backward
+			<li>To pan around focused item - press "Ctrl" key and then press and drag mouse right key
+		</ul>
+	</div>
 
-		<div id="alertDiv"></div>
+	<script type="text/javascript" src="lib/EditControl.js"></script>
+	<script type="text/javascript" src="config.js"></script>
+	<script type="text/javascript" src="worlds.js"></script>
+	<script type="text/javascript" src="assets.js"></script>
+	<script type="text/javascript" src="js/org/ssatguru/babylonjs/VishvaGUI.js"></script>
+	<script type="text/javascript" src="js/org/ssatguru/babylonjs/Vishva.js"></script>
+	<script type="text/javascript" src="js/org/ssatguru/babylonjs/HREFsearch.js"></script>
 
-		<div id="helpDiv" title="Help">
-			<h4>Avatar Movement Keys</h4>
-			<ul>
-				<li>Turn left, right - press "A,D" or "left,right arrow" key or press and drag left mouse key
-				<li>Strafe left, right - press "Q,E" key
-				<li>Go forward, backward - press "W,S" or "up,down arrow" key
-				<li>Run - press "shift" key while going forward, backward
-				<li>Jump - press and release "space" key
-			</ul>
-			<h4>Item Edit Keys</h4>
-			<ul>
-				<li>To select item - right click the item,
-				<li>To unselect item - press"Esc" key
-				<li>To move,rotate or scale selected item -press "1,2,or 3" key
-				<li>To focus (center the camera)on selected item - press "F" key
-				<li>To zoom in or out of focused item - scroll mouse wheel forward or backward
-				<li>To pan around focused item - press "Ctrl" key and then press and drag mouse right key
-			</ul>
-		</div>
+	<script type="text/javascript">
+		$(function() {
 
-		<script type="text/javascript" src="lib/EditControl.js"></script>
-		<script type="text/javascript" src="config.js"></script>
-		<script type="text/javascript" src="worlds.js"></script>
-		<script type="text/javascript" src="assets.js"></script>
-		<script type="text/javascript" src="js/org/ssatguru/babylonjs/VishvaGUI.js"></script>
-		<script type="text/javascript" src="js/org/ssatguru/babylonjs/Vishva.js"></script>
-		<script type="text/javascript" src="js/org/ssatguru/babylonjs/HREFsearch.js"></script>
-
-		<script type="text/javascript">
-			$(function() {
-
-				//change all buttons to jquery button
-				$("button").button();
-				$("button").click(function(e) {
-					$(this).blur();
-				});
-
-				var HREFsearch = org.ssatguru.babylonjs.HREFsearch;
-				var search = new HREFsearch();
-
-				var world, worldFolder, sceneFolder, sceneFile, editEnabled;
-
-				world = search.getParm("world");
-				if (world != "empty"){
-					if (!world) {
-						if (config) {
-							world = config.world;
-						}
-					}
-	
-					if (worlds && world) {
-						var worldData = worlds[world];
-						if (worldData) {
-							worldFolder = worldData.worldFolder;
-							sceneFolder = worldData.sceneFolder;
-							sceneFile = worldData.sceneFile;
-							editEnabled = worldData.editEnabled;
-						}
-					}
-	
-					var scenePath = "vishva/worlds/" + worldFolder + "/"
-							+ sceneFolder + "/";
-				}	
-				if (editEnabled == null)
-					editEnabled = true;
-				var Vishva = org.ssatguru.babylonjs.Vishva;
-				console.log("scene " + sceneFile);
-				var vishva = new Vishva(scenePath, sceneFile, "vCanvas",
-						editEnabled, assets);
+			//change all buttons to jquery button
+			$("button").button();
+			$("button").click(function(e) {
+				$(this).blur();
 			});
-		</script>
+
+			var HREFsearch = org.ssatguru.babylonjs.HREFsearch;
+			var search = new HREFsearch();
+
+			var world, worldFolder, sceneFolder, sceneFile, editEnabled;
+
+			world = search.getParm("world");
+			if (world != "empty") {
+				if (!world) {
+					if (config) {
+						world = config.world;
+					}
+				}
+
+				if (worlds && world) {
+					var worldData = worlds[world];
+					if (worldData) {
+						worldFolder = worldData.worldFolder;
+						sceneFolder = worldData.sceneFolder;
+						sceneFile = worldData.sceneFile;
+						editEnabled = worldData.editEnabled;
+					}
+				}
+
+				var scenePath = "vishva/worlds/" + worldFolder + "/"
+						+ sceneFolder + "/";
+			}
+			if (editEnabled == null)
+				editEnabled = true;
+			var Vishva = org.ssatguru.babylonjs.Vishva;
+			console.log("scene " + sceneFile);
+			var vishva = new Vishva(scenePath, sceneFile, "vCanvas",
+					editEnabled, assets);
+		});
+	</script>
 </body>
 
 </html>

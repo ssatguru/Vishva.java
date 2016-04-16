@@ -75,6 +75,10 @@ public class VishvaGUI {
 		this.vishva = vishva;
 
 		HTMLButtonElement showMenu = (HTMLButtonElement) document.getElementById("showMenu");
+		showMenu.style.visibility = "visible";
+		
+		
+		document.getElementById("menubar").style.visibility ="visible";
 		JQuery menuBar = (JQuery) ((Object) $("#menubar"));
 		JQueryPositionOptions jpo = new JQueryPositionOptions() {
 			{

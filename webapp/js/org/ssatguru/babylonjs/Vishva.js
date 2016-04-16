@@ -70,6 +70,7 @@ var org;
                         return;
                     }
                     this.loadingMsg = document.getElementById("loadingMsg");
+                    this.loadingStatus = document.getElementById("loadingStatus");
                     this.editEnabled = editEnabled;
                     this.assets = assets;
                     this.key = new Key();
@@ -85,6 +86,7 @@ var org;
                         this.onSceneLoaded(this.scene);
                     }
                     else {
+                        this.loadingStatus.innerHTML = "downloading world";
                         this.loadSceneFile(scenePath, sceneFile + ".js", this.scene);
                     }
                 }
@@ -103,6 +105,7 @@ var org;
                     this.snas = foo["VishvaSNA"];
                     var sceneData = "data:" + tfat.text;
                     SceneLoader.ShowLoadingScreen = false;
+                    this.loadingStatus.innerHTML = "loading scene";
                     SceneLoader.Append(this.scenePath, sceneData, this.scene, function (scene) { return _this.onSceneLoaded(scene); });
                 };
                 Vishva.prototype.onTaskFailure = function (obj) {
@@ -840,6 +843,7 @@ var org;
                 };
                 Vishva.prototype.onSceneLoaded = function (scene) {
                     var _this = this;
+                    this.loadingStatus.innerHTML = "checking assets";
                     var avFound = false;
                     var skelFound = false;
                     var sunFound = false;
@@ -1054,7 +1058,7 @@ var org;
                         this.vishvaGUI = null;
                     }
                     this.engine.hideLoadingUI();
-                    this.loadingMsg.parentNode.removeChild(this.loadingMsg);
+                    this.loadingMsg.style.visibility = "hidden";
                     this.engine.runRenderLoop(function () { return _this.scene.render(); });
                 };
                 Vishva.prototype.process = function () {
@@ -1162,13 +1166,13 @@ var org;
                     }
                     else if (this.key.stepLeft) {
                         anim = this.strafeLeft;
-                        stepLeft = this.avatar.calcMovePOV(-this.avatarSpeed / 2, 0, 0);
+                        stepLeft = this.avatar.calcMovePOV(-this.avatarSpeed / 2, -upSpeed * dir, 0);
                         this.avatar.moveWithCollisions(stepLeft);
                         moving = true;
                     }
                     else if (this.key.stepRight) {
                         anim = this.strafeRight;
-                        stepRight = this.avatar.calcMovePOV(this.avatarSpeed / 2, 0, 0);
+                        stepRight = this.avatar.calcMovePOV(this.avatarSpeed / 2, -upSpeed * dir, 0);
                         this.avatar.moveWithCollisions(stepRight);
                         moving = true;
                     }
@@ -2139,7 +2143,6 @@ var org;
                 function SNAproperties() {
                     this.signalId = "0";
                 }
-                SNAproperties.prototype.unmarshall = function (obj) { return null; };
                 return SNAproperties;
             })();
             babylonjs.SNAproperties = SNAproperties;
@@ -2164,7 +2167,6 @@ var org;
                     this.startSigId = "";
                     this.endSigId = "";
                 }
-                ActProperties.prototype.unmarshall = function (obj) { return null; };
                 return ActProperties;
             })(SNAproperties);
             babylonjs.ActProperties = ActProperties;

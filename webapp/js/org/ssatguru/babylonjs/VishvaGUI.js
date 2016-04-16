@@ -20,6 +20,8 @@ var org;
                     this.addMenuOn = false;
                     this.vishva = vishva;
                     var showMenu = document.getElementById("showMenu");
+                    showMenu.style.visibility = "visible";
+                    document.getElementById("menubar").style.visibility = "visible";
                     var menuBar = $("#menubar");
                     var jpo = Object.defineProperty({
                         my: "left center",
