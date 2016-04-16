@@ -16,7 +16,7 @@ More info at [http://ssatguru.appspot.com/BabylonJS-Vishva/intro.html](http://ss
 
 * cd to "webapp" folder. Open "index.html" in browser. If you are using firefox browser then you can open it directly from disk. For others you will have to serve the file via. some http server due to cross origin requests restrictions. See [here for some helpful information](https://github.com/mrdoob/three.js/wiki/How-to-run-things-locally)
 
-* for more help see wiki (https://github.com/ssatguru/Vishva/wiki)[https://github.com/ssatguru/Vishva/wiki]
+* for more help see [wiki](https://github.com/ssatguru/Vishva/wiki)
 
 ## to build
 
