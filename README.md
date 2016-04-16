@@ -44,7 +44,7 @@ No build required
 
 Source under "webapp/js" folder
 
-Dependecies under "webapp/lib" folder
+Dependencies under "webapp/lib" folder
 
 ## demo
 For a demo  see [http://ssatguru.appspot.com/BabylonJS-Vishva/webapp/index.html](http://ssatguru.appspot.com/BabylonJS-Vishva/webapp/index.html)
