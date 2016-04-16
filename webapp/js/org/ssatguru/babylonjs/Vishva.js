@@ -81,7 +81,6 @@ var org;
                     window.addEventListener("keydown", function (e) { return _this.onKeyDown(e); }, false);
                     window.addEventListener("keyup", function (e) { return _this.onKeyUp(e); }, false);
                     this.scenePath = scenePath;
-                    this.sceneFile = sceneFile;
                     if (sceneFile == null) {
                         this.onSceneLoaded(this.scene);
                     }
@@ -1255,6 +1254,7 @@ var org;
                 };
                 /**
                  * switch the edit control to the new mesh
+                 *
                  * @param mesh
                  */
                 Vishva.prototype.swicthEditControl = function (mesh) {
@@ -1409,9 +1409,8 @@ var org;
                     }
                 };
                 /**
-                 * workaround for bug in blender exporter
-                 * 4.4.3 animation ranges are off by 1
-                 * 4.4.4 issue with actions with just 2 frames -> from = to
+                 * workaround for bug in blender exporter 4.4.3 animation ranges are off by
+                 * 1 4.4.4 issue with actions with just 2 frames -> from = to
                  *
                  * @param skel
                  */
@@ -1703,7 +1702,6 @@ var org;
                 SNAManager.prototype.unMarshal = function (snas, scene) {
                     if (snas == null)
                         return;
-                    var act;
                     for (var index150 = 0; index150 < snas.length; index150++) {
                         var sna = snas[index150];
                         {
@@ -1713,14 +1711,7 @@ var org;
                                     this.createSensorByName(sna.name, mesh, sna.properties);
                                 }
                                 else if (sna.type == "ACTUATOR") {
-                                    if (sna.name == "Sound") {
-                                        var prop = new ActSoundProp();
-                                        prop.unmarshall(sna.properties);
-                                        act = this.createActuatorByName(sna.name, mesh, prop);
-                                    }
-                                    else {
-                                        act = this.createActuatorByName(sna.name, mesh, sna.properties);
-                                    }
+                                    this.createActuatorByName(sna.name, mesh, sna.properties);
                                 }
                             }
                         }
@@ -1774,7 +1765,6 @@ var org;
                     }
                     this.cleanUp();
                 };
-                SensorAbstract.prototype.cleanUp = function () { };
                 SensorAbstract.prototype.getSignalId = function () {
                     return this.properties.signalId;
                 };
@@ -1787,7 +1777,6 @@ var org;
                         return;
                     SNAManager.getSNAManager().emitSignal(this.properties.signalId);
                 };
-                SensorAbstract.prototype.getName = function () { return null; };
                 SensorAbstract.prototype.getProperties = function () {
                     return this.properties;
                 };
@@ -1797,7 +1786,6 @@ var org;
                 SensorAbstract.prototype.processUpdateGeneric = function () {
                     this.processUpdateSpecific();
                 };
-                SensorAbstract.prototype.processUpdateSpecific = function () { };
                 SensorAbstract.prototype.getType = function () {
                     return "SENSOR";
                 };
@@ -1873,16 +1861,12 @@ var org;
                     this.actuate();
                     return true;
                 };
-                ActuatorAbstract.prototype.actuate = function () { };
-                ActuatorAbstract.prototype.stop = function () { };
-                ActuatorAbstract.prototype.isReady = function () { return false; };
                 ActuatorAbstract.prototype.processQueue = function () {
                     if (this.queued > 0) {
                         this.queued--;
                         this.start();
                     }
                 };
-                ActuatorAbstract.prototype.getName = function () { return null; };
                 ActuatorAbstract.prototype.getType = function () {
                     return "ACTUATOR";
                 };
@@ -1911,7 +1895,6 @@ var org;
                     }
                     this.processUpdateSpecific();
                 };
-                ActuatorAbstract.prototype.processUpdateSpecific = function () { };
                 ActuatorAbstract.prototype.onActuateEnd = function () {
                     SNAManager.getSNAManager().emitSignal(this.properties.endSigId);
                     this.actuating = false;
@@ -1938,7 +1921,6 @@ var org;
                     }
                     this.cleanUp();
                 };
-                ActuatorAbstract.prototype.cleanUp = function () { };
                 return ActuatorAbstract;
             })();
             babylonjs.ActuatorAbstract = ActuatorAbstract;
@@ -2069,17 +2051,20 @@ var org;
                 ActuatorAnimator.prototype.actuate = function () {
                     var _this = this;
                     var prop = this.properties;
-                    this.mesh.skeleton.beginAnimation(prop.animationRange.value, prop.loop, prop.rate, function () { return _this.onActuateEnd(); });
+                    this.mesh.skeleton.beginAnimation(prop.animationRange.value, false, prop.rate, function () { return _this.onActuateEnd(); });
                 };
                 ActuatorAnimator.prototype.stop = function () {
                 };
                 ActuatorAnimator.prototype.isReady = function () {
-                    return false;
+                    return true;
                 };
                 ActuatorAnimator.prototype.getName = function () {
                     return "Animator";
                 };
                 ActuatorAnimator.prototype.processUpdateSpecific = function () {
+                    if (this.properties.autoStart) {
+                        var started = this.start();
+                    }
                 };
                 ActuatorAnimator.prototype.cleanUp = function () {
                 };
@@ -2236,22 +2221,7 @@ var org;
                     this.volume = new babylonjs.Range(0.0, 1.0, 1.0, 0.1);
                 }
                 ActSoundProp.prototype.unmarshall = function (obj) {
-                    var inObj = obj;
-                    var out = this;
-                    out.attachToMesh = inObj.attachToMesh;
-                    out.autoStart = inObj.autoStart;
-                    out.loop = inObj.loop;
-                    out.signalId = inObj.signalId;
-                    out.endSigId = inObj.endSigId;
-                    out.startSigId = inObj.startSigId;
-                    out.toggle = inObj.toggle;
-                    out.soundFile.value = inObj.soundFile.value;
-                    out.soundFile.values = inObj.soundFile.values;
-                    out.volume.max = inObj.volume.max;
-                    out.volume.min = out.volume.min;
-                    out.volume.value = inObj.volume.value;
-                    out.volume.step = inObj.volume.step;
-                    return out;
+                    return null;
                 };
                 return ActSoundProp;
             })(ActProperties);

@@ -108,35 +108,35 @@ public class Vishva {
 
 	VishvaGUI vishvaGUI;
 	boolean editAlreadyOpen = false;
-	
+
 	/**
 	 * use this to prevent users from switching to another mesh during edit.
 	 */
 	public boolean switchDisabled = false;
 
-	AnimData walk, walkBack, idle, run, jump, turnLeft, turnRight,strafeLeft,strafeRight;
+	AnimData walk, walkBack, idle, run, jump, turnLeft, turnRight, strafeLeft, strafeRight;
 	AnimData[] anims;
 	double avatarSpeed = 0.05;
 	AnimData prevAnim = null;
 
 	Key key;
-	
-	HTMLElement loadingMsg ;
+
+	HTMLElement loadingMsg;
 
 	// options
 	boolean showBoundingBox = false;
 	boolean cameraCollision = false;
 
-	public Vishva(String scenePath, String sceneFile, String canvasId, boolean editEnabled, jsweet.lang.Object assets ) {
-		
+	public Vishva(String scenePath, String sceneFile, String canvasId, boolean editEnabled, jsweet.lang.Object assets) {
+
 		if (!Engine.isSupported()) {
 			alert("not supported");
 			return;
 		}
-		
+
 		this.loadingMsg = document.getElementById("loadingMsg");
-		
-		this.editEnabled=editEnabled;
+
+		this.editEnabled = editEnabled;
 
 		this.assets = assets;
 		this.key = new Key();
@@ -152,20 +152,20 @@ public class Vishva {
 		window.addEventListener("keyup", this::onKeyUp, false);
 
 		this.scenePath = scenePath;
-		this.sceneFile = sceneFile;
-		
-		//this.engine.hideLoadingUI();
-		
+		//this.sceneFile = sceneFile;
+
+		// this.engine.hideLoadingUI();
+
 		if (sceneFile == null) {
 			onSceneLoaded(this.scene);
 		} else {
-			loadSceneFile(scenePath, sceneFile+".js", this.scene);
+			loadSceneFile(scenePath, sceneFile + ".js", this.scene);
 		}
 
 	}
 
 	String scenePath;
-	String sceneFile;
+	//String sceneFile;
 
 	private void loadSceneFile(String scenePath, String sceneFile, Scene scene) {
 		AssetsManager am = new AssetsManager(scene);
@@ -176,16 +176,15 @@ public class Vishva {
 	}
 
 	SNAserialized[] snas;
+
 	private void onTaskSuccess(Object obj) {
 		TextFileAssetTask tfat = (TextFileAssetTask) obj;
 		jsweet.lang.Object foo = (jsweet.lang.Object) JSON.parse(tfat.text);
 		snas = (SNAserialized[]) foo.$get("VishvaSNA");
 		String sceneData = "data:" + tfat.text;
-		SceneLoader.ShowLoadingScreen= false;
+		SceneLoader.ShowLoadingScreen = false;
 		SceneLoader.Append(this.scenePath, sceneData, this.scene, this::onSceneLoaded);
 	}
-	
-
 
 	private void onTaskFailure(Object obj) {
 		alert("scene load failed");
@@ -455,17 +454,17 @@ public class Vishva {
 			return "no mesh selected";
 		}
 		removeEditControl();
-		
-		//remove all sensors and actuators asscoiated with this mesh
+
+		// remove all sensors and actuators asscoiated with this mesh
 		SNAManager.getSNAManager().removeSNAs(this.meshPicked);
-		
-		//remove this mesh from the shadow generator map 
+
+		// remove this mesh from the shadow generator map
 		Array<AbstractMesh> meshes = Globals.array(this.shadowGenerator.getShadowMap().renderList);
 		double i = meshes.indexOf(this.meshPicked);
-		if (i >=0){
-			meshes.splice(i,1);
+		if (i >= 0) {
+			meshes.splice(i, 1);
 		}
-		
+
 		this.meshPicked.dispose();
 		return null;
 
@@ -499,63 +498,72 @@ public class Vishva {
 	public String[] getSoundFiles() {
 		return (String[]) this.assets.$get("sounds");
 	}
-	
-	//selected mesh properties
-	
-	public boolean anyMeshSelected(){
+
+	// selected mesh properties
+
+	public boolean anyMeshSelected() {
 		return this.isMeshSelected;
 	}
-	
-	public Vector3 getLocation(){
+
+	public Vector3 getLocation() {
 		return this.meshPicked.position;
 	}
-	
-	public Vector3 getRoation(){
+
+	public Vector3 getRoation() {
 		Vector3 euler = this.meshPicked.rotationQuaternion.toEulerAngles();
-		double r = 180/Math.PI;
+		double r = 180 / Math.PI;
 		Vector3 degrees = euler.multiplyByFloats(r, r, r);
 		return degrees;
 	}
-	public Vector3 getScale(){
+
+	public Vector3 getScale() {
 		return this.meshPicked.scaling;
 	}
-	//selected mesh skeleton and animations
-	public String getSkelName(){
-		if (this.meshPicked.skeleton == null ) return null;
-		else return this.meshPicked.skeleton.name;
+
+	// selected mesh skeleton and animations
+	public String getSkelName() {
+		if (this.meshPicked.skeleton == null)
+			return null;
+		else
+			return this.meshPicked.skeleton.name;
 	}
-	
-	public Skeleton getSkeleton(){
-		if (this.meshPicked.skeleton == null ) return null;
-		else return this.meshPicked.skeleton;
+
+	public Skeleton getSkeleton() {
+		if (this.meshPicked.skeleton == null)
+			return null;
+		else
+			return this.meshPicked.skeleton;
 	}
-	
-	public AnimationRange[] getAnimationRanges(){
+
+	public AnimationRange[] getAnimationRanges() {
 		Skeleton skel = this.meshPicked.skeleton;
-		Function getAnimationRanges =  (Function) skel.$get("getAnimationRanges");
+		Function getAnimationRanges = (Function) skel.$get("getAnimationRanges");
 		AnimationRange[] ranges = (AnimationRange[]) getAnimationRanges.call(skel);
 		return ranges;
 	}
-	
-	public void printAnimCount(Skeleton skel){
+
+	public void printAnimCount(Skeleton skel) {
 		Bone[] bones = skel.bones;
-		for(Bone bone:bones){
-			console.log(bone.name + "," + bone.animations.length + " , " + bone.animations[0].getHighestFrame() );
-			//bone.animations[0].goToFrame(10);
+		for (Bone bone : bones) {
+			console.log(bone.name + "," + bone.animations.length + " , " + bone.animations[0].getHighestFrame());
+			// bone.animations[0].goToFrame(10);
 			console.log(bone.animations[0]);
 		}
 	}
-	
-	public void playAnimation(String animName, String animRate, boolean loop){
+
+	public void playAnimation(String animName, String animRate, boolean loop) {
 		Skeleton skel = this.meshPicked.skeleton;
-		if (skel == null) return;
+		if (skel == null)
+			return;
 		double r = parseFloat(animRate);
-		if (isNaN(r)) r=1;
+		if (isNaN(r))
+			r = 1;
 		skel.beginAnimation(animName, loop, r);
 	}
-	
-	public void stopAnimation(){
-		if (this.meshPicked.skeleton == null) return;
+
+	public void stopAnimation() {
+		if (this.meshPicked.skeleton == null)
+			return;
 		this.scene.stopAnimation(this.meshPicked.skeleton);
 	}
 
@@ -836,10 +844,10 @@ public class Vishva {
 		// if (textureName.substring(0, 2) != "..") {
 		// sm.reflectionTexture.name = "../../../" + textureName;
 		// }
-		
+
 		jsweet.lang.Object snaObj = SNAManager.getSNAManager().serializeSnAs(this.scene);
 		String snaObjStr = JSON.stringify(snaObj);
-		
+
 		jsweet.lang.Object sceneObj = (jsweet.lang.Object) SceneSerializer.Serialize(this.scene);
 		sceneObj.$set("VishvaSNA", snaObj);
 		String sceneString = JSON.stringify(sceneObj);
@@ -1055,8 +1063,8 @@ public class Vishva {
 				StandardMaterial sm = (StandardMaterial) mesh.material;
 				renameAssetTextures(sm);
 			}
-			
-			if (mesh.skeleton != null){
+
+			if (mesh.skeleton != null) {
 				fixAnimationRanges(mesh.skeleton);
 			}
 		}
@@ -1075,14 +1083,17 @@ public class Vishva {
 		if (bt == null)
 			return;
 		String textureName = bt.name;
-		
-		//TODO
-		//something going on with texture name.
-		//if the name of the texture matches the name of  an already laoded texture 
-		//then it reuses the already loaded texture - is indexing being doen by texture name?
-		//it still loads the new texture though. wonder what happens to that.
-		
-		//if (textureName.indexOf("vishva/assets/") != 0 && textureName.indexOf("../") != 0) {
+
+		// TODO
+		// something going on with texture name.
+		// if the name of the texture matches the name of an already laoded
+		// texture
+		// then it reuses the already loaded texture - is indexing being doen by
+		// texture name?
+		// it still loads the new texture though. wonder what happens to that.
+
+		// if (textureName.indexOf("vishva/assets/") != 0 &&
+		// textureName.indexOf("../") != 0) {
 		if (textureName.indexOf("vishva/") != 0 && textureName.indexOf("../") != 0) {
 			bt.name = "vishva/assets/" + this.assetType + "/" + this.file + "/" + textureName;
 			console.log("renamed to " + bt.name);
@@ -1262,8 +1273,8 @@ public class Vishva {
 			this.scene.fogMode = Scene.FOGMODE_EXP;
 			this.scene.fogDensity = 0;
 		}
-		
-		if (this.editEnabled){
+
+		if (this.editEnabled) {
 			this.scene.onPointerDown = this::pickObject;
 		}
 
@@ -1279,7 +1290,6 @@ public class Vishva {
 		// garbage collect
 		this.snas = null;
 
-		
 		render();
 
 	}
@@ -1400,9 +1410,9 @@ public class Vishva {
 
 	private void startRenderLoop() {
 		backfaceCulling(this.scene.materials);
-		if (this.editEnabled){
+		if (this.editEnabled) {
 			vishvaGUI = new VishvaGUI(this);
-		}else{
+		} else {
 			vishvaGUI = null;
 		}
 		this.engine.hideLoadingUI();
@@ -1512,28 +1522,30 @@ public class Vishva {
 				}
 				jumpCycle--;
 			}
-//			forward = new Vector3(Math.sin(this.avatar.rotation.y) * speed, upSpeed * dir,
-//					Math.cos(this.avatar.rotation.y) * speed);
-//			forward = forward.negate();
-			forward = this.avatar.calcMovePOV(0,-upSpeed*dir, speed);
+			// forward = new Vector3(Math.sin(this.avatar.rotation.y) * speed,
+			// upSpeed * dir,
+			// Math.cos(this.avatar.rotation.y) * speed);
+			// forward = forward.negate();
+			forward = this.avatar.calcMovePOV(0, -upSpeed * dir, speed);
 			this.avatar.moveWithCollisions(forward);
 			moving = true;
 		} else if (this.key.down) {
-//			backwards = new Vector3(Math.sin(this.avatar.rotation.y) * (this.avatarSpeed / 2), -upSpeed,
-//					Math.cos(this.avatar.rotation.y) * (this.avatarSpeed / 2));
-			backwards = this.avatar.calcMovePOV(0,-upSpeed*dir, -this.avatarSpeed/2);
+			// backwards = new Vector3(Math.sin(this.avatar.rotation.y) *
+			// (this.avatarSpeed / 2), -upSpeed,
+			// Math.cos(this.avatar.rotation.y) * (this.avatarSpeed / 2));
+			backwards = this.avatar.calcMovePOV(0, -upSpeed * dir, -this.avatarSpeed / 2);
 			this.avatar.moveWithCollisions(backwards);
 			moving = true;
 			anim = this.walkBack;
 			if (this.key.jump)
 				this.key.jump = false;
 		} else if (this.key.stepLeft) {
-			anim=this.strafeLeft;
+			anim = this.strafeLeft;
 			stepLeft = this.avatar.calcMovePOV(-this.avatarSpeed / 2, 0, 0);
 			this.avatar.moveWithCollisions(stepLeft);
 			moving = true;
 		} else if (this.key.stepRight) {
-			anim=this.strafeRight;
+			anim = this.strafeRight;
 			stepRight = this.avatar.calcMovePOV(this.avatarSpeed / 2, 0, 0);
 			this.avatar.moveWithCollisions(stepRight);
 			moving = true;
@@ -1630,7 +1642,7 @@ public class Vishva {
 				this.editAlreadyOpen = vishvaGUI.showEditMenu();
 			} else {
 				if (pickResult.pickedMesh == this.meshPicked) {
-					//if clicked on already selected then focus on it
+					// if clicked on already selected then focus on it
 					if (this.focusOnAv) {
 						this.saveAVcameraPos.copyFrom(this.mainCamera.position);
 						this.focusOnAv = false;
@@ -1638,7 +1650,7 @@ public class Vishva {
 
 					focusOnMesh(this.meshPicked, 50);
 				} else {
-					// switch to this 
+					// switch to this
 					swicthEditControl(pickResult.pickedMesh);
 
 				}
@@ -1647,14 +1659,15 @@ public class Vishva {
 		}
 	}
 
-	
 	/**
 	 * switch the edit control to the new mesh
+	 * 
 	 * @param mesh
 	 */
 	private void swicthEditControl(AbstractMesh mesh) {
-		
-		if (this.switchDisabled) return; 
+
+		if (this.switchDisabled)
+			return;
 
 		SNAManager.getSNAManager().enableSnAs(this.meshPicked);
 
@@ -1816,8 +1829,8 @@ public class Vishva {
 		for (int i = 1; i < l; i++) {
 			skeletons[i].dispose();
 		}
-		
-		//setAnimationRange(this.avatarSkeleton);
+
+		// setAnimationRange(this.avatarSkeleton);
 		fixAnimationRanges(this.avatarSkeleton);
 		this.avatar.skeleton = this.avatarSkeleton;
 
@@ -1854,26 +1867,25 @@ public class Vishva {
 		}
 
 	}
-	
+
 	/**
-	 * workaround for bug in blender exporter 
-	 * 4.4.3 animation ranges are off by 1
-	 * 4.4.4 issue with actions with just 2 frames -> from = to
+	 * workaround for bug in blender exporter 4.4.3 animation ranges are off by
+	 * 1 4.4.4 issue with actions with just 2 frames -> from = to
 	 * 
 	 * @param skel
 	 */
-	private void fixAnimationRanges(Skeleton skel){
-		
-		Function getAnimationRanges =  (Function) skel.$get("getAnimationRanges");
+	private void fixAnimationRanges(Skeleton skel) {
+
+		Function getAnimationRanges = (Function) skel.$get("getAnimationRanges");
 		AnimationRange[] ranges = (AnimationRange[]) getAnimationRanges.call(skel);
-		for (AnimationRange range:ranges){
-			//range.from =  range.from +1;
-			//range.to= range.to+1;
-			if (range.from == range.to){
+		for (AnimationRange range : ranges) {
+			// range.from = range.from +1;
+			// range.to= range.to+1;
+			if (range.from == range.to) {
 				range.to++;
 			}
 		}
-		
+
 	}
 
 	// the following camera properties are not serialized
@@ -1961,7 +1973,7 @@ class SNAManager {
 	jsweet.lang.Object sensors;
 	jsweet.lang.Object actuators;
 	String[] sensorList = new String[] { "Touch" };
-	String[] actuatorList = new String[] { "Animator","Mover", "Rotator", "Sound" };
+	String[] actuatorList = new String[] { "Animator", "Mover", "Rotator", "Sound" };
 
 	//
 	Array<AbstractMesh> snaDisabledList = new Array();
@@ -1998,7 +2010,7 @@ class SNAManager {
 	}
 
 	// should make these ...byName() more generic
-	// during scene load properties are unmarshalled from scenefile and passed 
+	// during scene load properties are unmarshalled from scenefile and passed
 	// during initial creration properties are null
 	public Sensor createSensorByName(String name, Mesh mesh, SNAproperties prop) {
 		if (name == "Touch") {
@@ -2010,7 +2022,7 @@ class SNAManager {
 		return null;
 	}
 
-	// during scene load properties are unmarshalled from scenefile and passed 
+	// during scene load properties are unmarshalled from scenefile and passed
 	// during initial creation properties are null
 	public Actuator createActuatorByName(String name, Mesh mesh, SNAproperties prop) {
 		if (name == "Mover") {
@@ -2028,7 +2040,7 @@ class SNAManager {
 				return new ActuatorSound(mesh, (ActSoundProp) prop);
 			else
 				return new ActuatorSound(mesh, new ActSoundProp());
-		}else if (name == "Animator") {
+		} else if (name == "Animator") {
 			if (prop != null)
 				return new ActuatorAnimator(mesh, (AnimatorProp) prop);
 			else
@@ -2048,7 +2060,8 @@ class SNAManager {
 	}
 
 	public void emitSignal(String signalId) {
-		if (signalId.trim()=="") return;
+		if (signalId.trim() == "")
+			return;
 		Object keyValue = sig2actMap.$get(signalId);
 		if (keyValue != null) {
 			window.setTimeout(function(this::actuate), 0, keyValue);
@@ -2168,6 +2181,7 @@ class SNAManager {
 
 	}
 
+	// return an array of sensors and actuators
 	public jsweet.lang.Object serializeSnAs(Scene scene) {
 		jsweet.lang.Array<SNAserialized> snas = new jsweet.lang.Array<SNAserialized>();
 		SNAserialized sna;
@@ -2208,20 +2222,14 @@ class SNAManager {
 	public void unMarshal(SNAserialized[] snas, Scene scene) {
 		if (snas == null)
 			return;
-		Actuator act;
+
 		for (SNAserialized sna : snas) {
 			Mesh mesh = scene.getMeshesByTags(sna.meshId)[0];
 			if (mesh != null) {
 				if (sna.type == "SENSOR") {
 					createSensorByName(sna.name, mesh, sna.properties);
 				} else if (sna.type == "ACTUATOR") {
-					if (sna.name == "Sound") {
-						ActSoundProp prop = new ActSoundProp();
-						prop.unmarshall(sna.properties);
-						act = createActuatorByName(sna.name, mesh, prop);
-					} else {
-						act = createActuatorByName(sna.name, mesh, sna.properties);
-					}
+					createActuatorByName(sna.name, mesh, sna.properties);
 				}
 			}
 		}
@@ -2261,13 +2269,14 @@ interface SensorActuator {
 	public void setProperties(SNAproperties properties);
 
 	/**
-	 * this is called by the system after the ctuator properties are updated
+	 * this is called by the system after the actuator properties are updated
 	 */
 	public void processUpdateGeneric();
 
 	/**
-	 * called by {@processUpdateGeneric} implementors should do their sensor
-	 * actuator specific updates here
+	 * called by {@processUpdateGeneric}' implementors should do their sensor
+	 * actuator specific updates here if autostart specified then do a start
+	 * here
 	 */
 	public void processUpdateSpecific();
 
@@ -2399,7 +2408,9 @@ abstract class SensorAbstract implements Sensor {
 		// }
 	}
 
-	abstract public void cleanUp();
+	// abstract public void cleanUp();
+	// public abstract String getName();
+	// public abstract void processUpdateSpecific();
 
 	public String getSignalId() {
 		return this.properties.signalId;
@@ -2417,8 +2428,6 @@ abstract class SensorAbstract implements Sensor {
 		SNAManager.getSNAManager().emitSignal(this.properties.signalId);
 	}
 
-	public abstract String getName();
-
 	public SNAproperties getProperties() {
 		return this.properties;
 	};
@@ -2430,8 +2439,6 @@ abstract class SensorAbstract implements Sensor {
 	final public void processUpdateGeneric() {
 		processUpdateSpecific();
 	};
-
-	public abstract void processUpdateSpecific();
 
 	final public String getType() {
 		return "SENSOR";
@@ -2535,11 +2542,15 @@ abstract class ActuatorAbstract implements Actuator {
 		return true;
 	}
 
-	public abstract void actuate();
-
-	public abstract void stop();
-
-	public abstract boolean isReady();
+	// public abstract void actuate();
+	//
+	// public abstract void stop();
+	//
+	// public abstract boolean isReady();
+	//
+	// public abstract String getName();
+	//
+	// abstract public void cleanUp();
 
 	final public void processQueue() {
 		if (queued > 0) {
@@ -2547,8 +2558,6 @@ abstract class ActuatorAbstract implements Actuator {
 			start();
 		}
 	}
-
-	public abstract String getName();
 
 	final public String getType() {
 		return "ACTUATOR";
@@ -2578,6 +2587,7 @@ abstract class ActuatorAbstract implements Actuator {
 	 * @see org.ssatguru.babylonjs.Actuator#processUpdate()
 	 */
 	final public void processUpdateGeneric() {
+		// check if signalId changed, if yes then resubscribe
 		if (this.signalId != null && this.signalId != this.properties.signalId) {
 			SNAManager.getSNAManager().unSubscribe(this, this.signalId);
 			this.signalId = this.properties.signalId;
@@ -2590,7 +2600,7 @@ abstract class ActuatorAbstract implements Actuator {
 
 	}
 
-	abstract public void processUpdateSpecific();
+	// abstract public void processUpdateSpecific();
 
 	public Object onActuateEnd() {
 		SNAManager.getSNAManager().emitSignal(this.properties.endSigId);
@@ -2619,8 +2629,6 @@ abstract class ActuatorAbstract implements Actuator {
 		}
 		cleanUp();
 	}
-
-	abstract public void cleanUp();
 
 }
 
@@ -2769,18 +2777,18 @@ class ActuatorMover extends ActuatorAbstract {
 
 }
 
-class ActuatorAnimator extends ActuatorAbstract{
+class ActuatorAnimator extends ActuatorAbstract {
 
 	public ActuatorAnimator(Mesh mesh, AnimatorProp prop) {
 		super(mesh, prop);
 		Skeleton skel = mesh.skeleton;
-		if (skel != null){
-			Function getAnimationRanges =  (Function) skel.$get("getAnimationRanges");
+		if (skel != null) {
+			Function getAnimationRanges = (Function) skel.$get("getAnimationRanges");
 			AnimationRange[] ranges = (AnimationRange[]) getAnimationRanges.call(skel);
 			String[] animNames = new String[ranges.length];
-			int i =0;
-			for (AnimationRange range:ranges){
-				animNames[i]=  range.name;
+			int i = 0;
+			for (AnimationRange range : ranges) {
+				animNames[i] = range.name;
 				i++;
 			}
 			prop.animationRange.values = animNames;
@@ -2790,38 +2798,40 @@ class ActuatorAnimator extends ActuatorAbstract{
 	@Override
 	public void actuate() {
 		AnimatorProp prop = (AnimatorProp) this.properties;
-		this.mesh.skeleton.beginAnimation(prop.animationRange.value,prop.loop,prop.rate,this::onActuateEnd);
+		this.mesh.skeleton.beginAnimation(prop.animationRange.value, false, prop.rate, this::onActuateEnd);
 	}
 
 	@Override
 	public void stop() {
-		
 	}
 
 	@Override
 	public boolean isReady() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
 		return "Animator";
 	}
 
 	@Override
 	public void processUpdateSpecific() {
-		// TODO Auto-generated method stub
-		
+		if (properties.autoStart) {
+			boolean started = this.start();
+			// sometime a start maynot be possible example during edit
+			// if could not start now then queue it for later start
+			// if (!started)
+			// this.queued++;
+		}
 	}
 
 	@Override
 	public void cleanUp() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 }
 
 class ActuatorSound extends ActuatorAbstract {
@@ -2838,6 +2848,9 @@ class ActuatorSound extends ActuatorAbstract {
 	}
 
 	@Override
+	// update is little tricky here as sound file has to be loaded and that
+	// happens aynchronously
+	// it is not ready to play immediately
 	public void processUpdateSpecific() {
 		ActSoundProp properties = (ActSoundProp) this.properties;
 		if (properties.soundFile.value == null)
@@ -2908,12 +2921,11 @@ class ActuatorSound extends ActuatorAbstract {
 
 abstract class SNAproperties extends jsweet.lang.Object {
 	String signalId = "0";
-	
+
 	public abstract SNAproperties unmarshall(jsweet.lang.Object obj);
 }
 
 class SenTouchProp extends SNAproperties {
-
 
 	@Override
 	public SenTouchProp unmarshall(jsweet.lang.Object obj) {
@@ -2924,32 +2936,28 @@ class SenTouchProp extends SNAproperties {
 }
 
 abstract class ActProperties extends SNAproperties {
-	
 
 	boolean autoStart = false;
 	boolean loop = false;
 	boolean toggle = true;
 	String startSigId = "";
 	String endSigId = "";
-	
-	
+
 	@Override
 	public abstract ActProperties unmarshall(jsweet.lang.Object obj);
 }
 
 class ActRotatorParm extends ActProperties {
-	
 
 	double x = 0;
 	double y = 90;
 	double z = 0;
 	double duration = 1;
 
-
 	//
 	// TODO:always local for now. provide a way to do global rotate
 	// boolean local = false;
-	
+
 	@Override
 	public ActRotatorParm unmarshall(jsweet.lang.Object obj) {
 		// TODO Auto-generated method stub
@@ -2958,15 +2966,12 @@ class ActRotatorParm extends ActProperties {
 }
 
 class ActMoverParm extends ActProperties {
-	
 
 	double x = 1;
 	double y = 1;
 	double z = 1;
 	double duration = 1;
 	boolean local = false;
-	
-
 
 	@Override
 	public ActMoverParm unmarshall(jsweet.lang.Object obj) {
@@ -2975,20 +2980,16 @@ class ActMoverParm extends ActProperties {
 }
 
 class AnimatorProp extends ActProperties {
-	
-	
 
 	SelectType animationRange = new SelectType();
-	double rate=1;
-	
-
+	double rate = 1;
 
 	@Override
 	public ActProperties unmarshall(jsweet.lang.Object obj) {
-		
+
 		return null;
 	}
-	
+
 }
 
 class ActSoundProp extends ActProperties {
@@ -2996,25 +2997,8 @@ class ActSoundProp extends ActProperties {
 	SelectType soundFile = new SelectType();
 	boolean attachToMesh = false;
 	Range volume = new Range(0.0, 1.0, 1.0, 0.1);
-	
-	
 
 	public ActSoundProp unmarshall(jsweet.lang.Object obj) {
-		ActSoundProp inObj = (ActSoundProp) obj;
-		ActSoundProp out = this;
-		out.attachToMesh = inObj.attachToMesh;
-		out.autoStart = inObj.autoStart;
-		out.loop = inObj.loop;
-		out.signalId = inObj.signalId;
-		out.endSigId = inObj.endSigId;
-		out.startSigId = inObj.startSigId;
-		out.toggle = inObj.toggle;
-		out.soundFile.value = inObj.soundFile.value;
-		out.soundFile.values = inObj.soundFile.values;
-		out.volume.max = inObj.volume.max;
-		out.volume.min = out.volume.min;
-		out.volume.value = inObj.volume.value;
-		out.volume.step = inObj.volume.step;
-		return out;
+		return null;
 	}
 }

@@ -344,29 +344,28 @@ table, th, td {
 				var world, worldFolder, sceneFolder, sceneFile, editEnabled;
 
 				world = search.getParm("world");
-				console.log(world);
-				if (!world) {
-					if (config) {
-						world = config.world;
+				if (world != "empty"){
+					if (!world) {
+						if (config) {
+							world = config.world;
+						}
 					}
-				}
-
-				if (worlds && world) {
-					var worldData = worlds[world];
-					if (worldData) {
-						worldFolder = worldData.worldFolder;
-						sceneFolder = worldData.sceneFolder;
-						sceneFile = worldData.sceneFile;
-						editEnabled = worldData.editEnabled;
+	
+					if (worlds && world) {
+						var worldData = worlds[world];
+						if (worldData) {
+							worldFolder = worldData.worldFolder;
+							sceneFolder = worldData.sceneFolder;
+							sceneFile = worldData.sceneFile;
+							editEnabled = worldData.editEnabled;
+						}
 					}
-				}
-
-				var scenePath = "vishva/worlds/" + worldFolder + "/"
-						+ sceneFolder + "/";
-
+	
+					var scenePath = "vishva/worlds/" + worldFolder + "/"
+							+ sceneFolder + "/";
+				}	
 				if (editEnabled == null)
 					editEnabled = true;
-
 				var Vishva = org.ssatguru.babylonjs.Vishva;
 				console.log("scene " + sceneFile);
 				var vishva = new Vishva(scenePath, sceneFile, "vCanvas",

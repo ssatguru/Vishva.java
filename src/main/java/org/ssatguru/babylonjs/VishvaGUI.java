@@ -56,15 +56,7 @@ import jsweet.util.StringTypes;
 import jsweet.util.function.TriConsumer;
 import jsweet.util.union.Union;
 
-/*
- * color pickers
- * http://www.jqueryrain.com/demo/jquery-color-picker/
- * https://github.com/PitPik/tinyColorPicker
- * http://www.abeautifulsite.net/jquery-minicolors-a-color-selector-for-input-controls/
- https://github.com/DavidDurman/FlexiColorPicker
- * 
- * 
- */
+
 public class VishvaGUI {
 
 	private Vishva vishva;
@@ -722,7 +714,9 @@ public class VishvaGUI {
 
 			// String t = (String) jsweet.lang.Globals.eval("typeof snap[key]");
 			String t = typeof(snap.$get(key));
-			if ((t == "object") && (snap.$get(key) instanceof SelectType)) {
+			//if ((t == "object") && (snap.$get(key) instanceof SelectType)) {
+			if ((t == "object") && (((jsweet.lang.Object)snap.$get(key)).$get("type")=="SelectType")) {
+				
 				console.log("is of type SelectType");
 				SelectType keyValue = (SelectType) snap.$get(key);
 				String[] options = keyValue.values;
@@ -744,7 +738,8 @@ public class VishvaGUI {
 				inp.id = idPrefix + key;
 				inp.className = "ui-widget-content ui-corner-all";
 				inp.value = (String) snap.$get(key);
-				if ((t == "object") && (snap.$get(key)) instanceof Range) {
+				//if ((t == "object") && (snap.$get(key)) instanceof Range) {
+				if ((t == "object") && (((jsweet.lang.Object)snap.$get(key)).$get("type")=="Range")) {
 					Range r = (Range) snap.$get(key);
 					inp.type = "range";
 					inp.max = (new jsweet.lang.Number(r.max)).toString();
@@ -773,14 +768,15 @@ public class VishvaGUI {
 		for (String key : keys) {
 			// String t = (String) jsweet.lang.Globals.eval("typeof snap[key]");
 			String t = typeof(snap.$get(key));
-
-			if ((t == "object") && (snap.$get(key) instanceof SelectType)) {
+			if ((t == "object") && (((jsweet.lang.Object)snap.$get(key)).$get("type")=="SelectType")) {
+			//if ((t == "object") && (snap.$get(key) instanceof SelectType)) {
 				SelectType s = (SelectType) snap.$get(key);
 				HTMLSelectElement sel = (HTMLSelectElement) document.getElementById(idPrefix + key);
 				s.value = sel.value;
 			} else {
 				HTMLInputElement ie = (HTMLInputElement) document.getElementById(idPrefix + key);
-				if ((t == "object") && (snap.$get(key) instanceof Range)) {
+				if ((t == "object") && (((jsweet.lang.Object)snap.$get(key)).$get("type")=="Range")) {
+				//if ((t == "object") && (snap.$get(key) instanceof Range)) {
 					Range r = (Range) snap.$get(key);
 					r.value = parseFloat(ie.value);
 				} else if ((t == "string") || (t == "number")) {
@@ -1271,6 +1267,15 @@ public class VishvaGUI {
 
 }
 
+/*
+ * color pickers
+ * http://www.jqueryrain.com/demo/jquery-color-picker/
+ * https://github.com/PitPik/tinyColorPicker
+ * http://www.abeautifulsite.net/jquery-minicolors-a-color-selector-for-input-controls/
+ * https://github.com/DavidDurman/FlexiColorPicker
+ * 
+ * 
+ */
 @Ambient
 class ColorPicker extends jsweet.lang.Object {
 	public ColorPicker(HTMLElement e, TriConsumer<Object, Object, RGB> f) {
@@ -1287,6 +1292,7 @@ class RGB {
 }
 
 class Range {
+	public final String type="Range";
 	public double min;
 	public double max;
 	public double value;
@@ -1301,6 +1307,7 @@ class Range {
 }
 
 class SelectType {
+	public final String type="SelectType";
 	public String[] values;
 	public String value;
 }

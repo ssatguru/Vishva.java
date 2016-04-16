@@ -531,7 +531,7 @@ var org;
                             cell.innerHTML = key;
                             cell = row.insertCell();
                             var t = typeof snap[key];
-                            if ((t == "object") && (snap[key] instanceof org.ssatguru.babylonjs.SelectType)) {
+                            if ((t == "object") && (snap[key]["type"] == "SelectType")) {
                                 console.log("is of type SelectType");
                                 var keyValue = snap[key];
                                 var options = keyValue.values;
@@ -555,7 +555,7 @@ var org;
                                 inp.id = idPrefix + key;
                                 inp.className = "ui-widget-content ui-corner-all";
                                 inp.value = snap[key];
-                                if ((t == "object") && ((snap[key]) instanceof org.ssatguru.babylonjs.Range)) {
+                                if ((t == "object") && (snap[key]["type"] == "Range")) {
                                     var r = snap[key];
                                     inp.type = "range";
                                     inp.max = (new Number(r.max)).toString();
@@ -586,14 +586,14 @@ var org;
                         var key = keys[index162];
                         {
                             var t = typeof snap[key];
-                            if ((t == "object") && (snap[key] instanceof org.ssatguru.babylonjs.SelectType)) {
+                            if ((t == "object") && (snap[key]["type"] == "SelectType")) {
                                 var s = snap[key];
                                 var sel = document.getElementById(idPrefix + key);
                                 s.value = sel.value;
                             }
                             else {
                                 var ie = document.getElementById(idPrefix + key);
-                                if ((t == "object") && (snap[key] instanceof org.ssatguru.babylonjs.Range)) {
+                                if ((t == "object") && (snap[key]["type"] == "Range")) {
                                     var r = snap[key];
                                     r.value = parseFloat(ie.value);
                                 }
@@ -924,6 +924,7 @@ var org;
             babylonjs.RGB = RGB;
             var Range = (function () {
                 function Range(min, max, value, step) {
+                    this.type = "Range";
                     this.min = min;
                     this.max = max;
                     this.value = value;
@@ -934,6 +935,7 @@ var org;
             babylonjs.Range = Range;
             var SelectType = (function () {
                 function SelectType() {
+                    this.type = "SelectType";
                 }
                 return SelectType;
             })();
