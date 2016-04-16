@@ -28,7 +28,7 @@ More info at [http://ssatguru.appspot.com/BabylonJS-Vishva/intro.html](http://ss
 
 * this project has a dependency on the [EditControl Artifact](https://github.com/ssatguru/BabylonJS-EditControl). Download, build and install that in your local Maven repository.
 
-* to build run command following command, from the project root folder (this has the "pom.xml" file)
+* to build, run following command, from the project root folder (this has the "pom.xml" file)
 ```
 mvn generate-sources
 ```
