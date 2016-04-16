@@ -45,3 +45,11 @@ Note:This is still work in progress.
 * [JSweet](http://www.jsweet.org/)
 * [JQuery UI](https://jqueryui.com/)
 * [FlexiColorPicker](https://github.com/DavidDurman/FlexiColorPicker)
+
+## 3d assets, animations
+* [Eat Sheep , Blend Swap](http://www.blendswap.com/blends/view/25065)
+* [Yo Frankie, Blender Institutte](https://apricot.blender.org/download/)
+* [Mixamo](https://www.mixamo.com/)
+* [SecondLife Internal Animations and Skeleton](http://wiki.secondlife.com/wiki/Internal_Animations)
+* 
+
