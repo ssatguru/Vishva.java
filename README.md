@@ -16,7 +16,7 @@ More info at [http://ssatguru.appspot.com/BabylonJS-Vishva/intro.html](http://ss
 
 * cd to "webapp" folder. Open "index.html" in browser. If you are using firefox browser then you can open it directly from disk. For others you will have to serve the file via. some http server due to cross origin requests restrictions. See [here for some helpful information](https://github.com/mrdoob/three.js/wiki/How-to-run-things-locally)
 
-* move your avatar using the "w a s d q e" keys. To run press shift and "w". To jump press and release "Space" key. Right click and drag mouse to look around. To select an item for edit, mouse right click the item. when selected use 1,2 ,3 and F keys to move,rotate,scale and focus on the item. To unslect an item press "esc" key.
+* for more help see wiki (https://github.com/ssatguru/Vishva/wiki)[https://github.com/ssatguru/Vishva/wiki]
 
 ## to build
 
