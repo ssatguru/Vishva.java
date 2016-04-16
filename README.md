@@ -49,7 +49,7 @@ Dependencies under "webapp/lib" folder
 ## demo
 For a demo  see [http://ssatguru.appspot.com/BabylonJS-Vishva/webapp/index.html](http://ssatguru.appspot.com/BabylonJS-Vishva/webapp/index.html)
 
-## build using
+## built using
 * [BabylonJS](http://www.babylonjs.com/)
 * [Java](https://www.oracle.com/java/index.html)
 * [JSweet](http://www.jsweet.org/)
