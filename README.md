@@ -20,18 +20,28 @@ More info at [http://ssatguru.appspot.com/BabylonJS-Vishva/intro.html](http://ss
 
 ## to build
 
+### for Java debelopers
+
+* this is a standard java maven project
+
+* source under "src" folder
+
 * this project has a dependency on the [EditControl Artifact](https://github.com/ssatguru/BabylonJS-EditControl). Download, build and install that in your local Maven repository.
 
-* download this project, if you haven't already done so.
-
-* cd to the project root folder. This should have the maven "pom.xml" file.
-
-* run command 
+* to build run command following command from the project root folder (this has the "pom.xml" file)
 
 ```
 mvn generate-sources
-(This will transpile the java source code files to javascript files and store them in "target/js" folder)
 ```
+* this will generate all the javascript and typescript file under webapp/js folder
+
+### for JavaScript and TypeScript developers
+
+No build required
+
+Source is under webapp/js
+
+Dependecies under webapp/lib
 
 ## demo
 For a demo  see [http://ssatguru.appspot.com/BabylonJS-Vishva/webapp/index.html](http://ssatguru.appspot.com/BabylonJS-Vishva/webapp/index.html)
