@@ -51,5 +51,5 @@ Note:This is still work in progress.
 * [Yo Frankie, Blender Institutte](https://apricot.blender.org/download/)
 * [Mixamo](https://www.mixamo.com/)
 * [SecondLife Internal Animations and Skeleton](http://wiki.secondlife.com/wiki/Internal_Animations)
-* 
+
 
