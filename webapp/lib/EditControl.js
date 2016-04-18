@@ -1,4 +1,4 @@
-"Generated from Java with JSweet 1.1.0-SNAPSHOT - http://www.jsweet.org";
+"Generated from Java with JSweet 1.0.0 - http://www.jsweet.org";
 var org;
 (function (org) {
     var ssatguru;
@@ -25,6 +25,7 @@ var org;
                         this.axesLen = 0.4;
                         this.axesScale = 1;
                         this.pDown = false;
+                        this.pointerIsOver = false;
                         this.editing = false;
                         this.snapX = 0;
                         this.snapY = 0;
@@ -32,6 +33,7 @@ var org;
                         this.snapRX = 0;
                         this.snapRY = 0;
                         this.snapRZ = 0;
+                        this.eulerian = false;
                         this.transEnabled = false;
                         this.rotEnabled = false;
                         this.scaleEnabled = false;
@@ -43,7 +45,7 @@ var org;
                         this.actHist = new ActHist(mesh, 10);
                         mesh.computeWorldMatrix(true);
                         this.theParent = new Mesh("EditControl", this.scene);
-                        this.theParent.position = this.meshPicked.position;
+                        this.theParent.position = this.meshPicked.absolutePosition;
                         this.theParent.visibility = 0;
                         this.theParent.isPickable = false;
                         this.createMaterials(this.scene);
@@ -63,7 +65,7 @@ var org;
                     }
                     EditControl.prototype.renderLoopProcess = function () {
                         this.setAxesScale();
-                        this.theParent.position = this.meshPicked.position;
+                        this.theParent.position = this.meshPicked.absolutePosition;
                         this.onPointerOver();
                     };
                     EditControl.prototype.switchTo = function (mesh) {
@@ -147,6 +149,9 @@ var org;
                         var canvas = can;
                         camera.detachControl(canvas);
                     };
+                    EditControl.prototype.isPointerOver = function () {
+                        return this.pointerIsOver;
+                    };
                     EditControl.prototype.onPointerOver = function () {
                         var _this = this;
                         if ((this.pDown))
@@ -168,6 +173,7 @@ var org;
                         }, null, this.mainCamera);
                         if ((pickResult.hit)) {
                             if ((pickResult.pickedMesh != this.prevOverMesh)) {
+                                this.pointerIsOver = true;
                                 if ((this.prevOverMesh != null)) {
                                     this.prevOverMesh.visibility = 0;
                                     this.restoreColor(this.prevOverMesh);
@@ -191,6 +197,7 @@ var org;
                             }
                         }
                         else {
+                            this.pointerIsOver = false;
                             if ((this.prevOverMesh != null)) {
                                 this.restoreColor(this.prevOverMesh);
                                 this.prevOverMesh = null;
@@ -370,9 +377,14 @@ var org;
                         }
                     };
                     EditControl.prototype.doRotation = function (newPos) {
+                        if ((this.meshPicked.rotation != null && this.meshPicked.rotationQuaternion == null)) {
+                            this.eulerian = true;
+                        }
+                        else
+                            this.eulerian = false;
                         var cN = Vector3.TransformNormal(Axis.Z, this.mainCamera.getWorldMatrix());
                         if ((this.axisPicked == this.rX)) {
-                            var angle = EditControl.getAngle(this.prevPos, newPos, this.meshPicked.position, cN);
+                            var angle = EditControl.getAngle(this.prevPos, newPos, this.meshPicked.absolutePosition, cN);
                             if ((this.snapR)) {
                                 this.snapRX += angle;
                                 angle = 0;
@@ -394,7 +406,7 @@ var org;
                             this.setLocalAxes(this.meshPicked);
                         }
                         else if ((this.axisPicked == this.rY)) {
-                            var angle = EditControl.getAngle(this.prevPos, newPos, this.meshPicked.position, cN);
+                            var angle = EditControl.getAngle(this.prevPos, newPos, this.meshPicked.absolutePosition, cN);
                             if ((this.snapR)) {
                                 this.snapRY += angle;
                                 angle = 0;
@@ -416,7 +428,7 @@ var org;
                             this.setLocalAxes(this.meshPicked);
                         }
                         else if ((this.axisPicked == this.rZ)) {
-                            var angle = EditControl.getAngle(this.prevPos, newPos, this.meshPicked.position, cN);
+                            var angle = EditControl.getAngle(this.prevPos, newPos, this.meshPicked.absolutePosition, cN);
                             if ((this.snapR)) {
                                 this.snapRZ += angle;
                                 angle = 0;
@@ -436,6 +448,10 @@ var org;
                             else
                                 this.meshPicked.rotate(new Vector3(0, 0, cN.z), angle, Space.WORLD);
                             this.setLocalAxes(this.meshPicked);
+                        }
+                        if ((this.eulerian)) {
+                            this.meshPicked.rotation = this.meshPicked.rotationQuaternion.toEulerAngles();
+                            this.meshPicked.rotationQuaternion = null;
                         }
                     };
                     EditControl.prototype.getPosOnPickPlane = function () {
@@ -686,7 +702,7 @@ var org;
                         return box;
                     };
                     EditControl.prototype.createCircle = function (r) {
-                        var points = new Array(36);
+                        var points = [];
                         var x;
                         var y;
                         var a = 3.14 / 180;
@@ -763,7 +779,7 @@ var org;
                     };
                     EditControl.prototype.setLocalAxes = function (mesh) {
                         var meshMatrix = mesh.getWorldMatrix();
-                        var pos = mesh.position;
+                        var pos = mesh.absolutePosition;
                         this.localX = Vector3.TransformCoordinates(Axis.X, meshMatrix).subtract(pos);
                         this.localY = Vector3.TransformCoordinates(Axis.Y, meshMatrix).subtract(pos);
                         this.localZ = Vector3.TransformCoordinates(Axis.Z, meshMatrix).subtract(pos);

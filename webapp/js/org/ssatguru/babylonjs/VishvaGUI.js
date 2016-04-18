@@ -75,15 +75,15 @@ var org;
                     }, '__interfaces', { configurable: true, value: ["def.jqueryui.jqueryui.JQueryPositionOptions"] });
                 };
                 /**
-                 * resposition all dialogs to their original default postions , on window
-                 * resize without this some dialogs might go outside the window and thus
-                 * disappear
+                 * resposition all dialogs to their original default postions
+                 * without this, a window resize could end up moving some dialogs outside the window
+                 * and thus make them disappear
                  *
                  * @param evt
                  */
                 VishvaGUI.prototype.onWindowResize = function (evt) {
-                    for (var index153 = 0; index153 < this.dialogs.length; index153++) {
-                        var jq = this.dialogs[index153];
+                    for (var index156 = 0; index156 < this.dialogs.length; index156++) {
+                        var jq = this.dialogs[index156];
                         {
                             var jpo = jq["jpo"];
                             if (jpo != null) {
@@ -102,8 +102,8 @@ var org;
                     var assetTypes = Object.keys(this.vishva.assets);
                     var addMenu = document.getElementById("AddMenu");
                     var f = function (e) { return _this.onAddMenuItemClick(e); };
-                    for (var index154 = 0; index154 < assetTypes.length; index154++) {
-                        var assetType = assetTypes[index154];
+                    for (var index157 = 0; index157 < assetTypes.length; index157++) {
+                        var assetType = assetTypes[index157];
                         {
                             if (assetType == "sounds") {
                                 continue;
@@ -157,14 +157,13 @@ var org;
                     }
                     var f = function (e) { return _this.onAssetImgClick(e); };
                     var row = tbl.insertRow();
-                    for (var index155 = 0; index155 < items.length; index155++) {
-                        var item = items[index155];
+                    for (var index158 = 0; index158 < items.length; index158++) {
+                        var item = items[index158];
                         {
                             var img = document.createElement("img");
                             img.id = item;
                             img.src = "vishva/assets/" + assetType + "/" + item + "/" + item + ".jpg";
                             img.setAttribute("style", VishvaGUI.SMALL_ICON_SIZE + "cursor:pointer;");
-                            img.setAttribute("alt", "Icon");
                             img.className = assetType;
                             img.onclick = f;
                             var cell = row.insertCell();
@@ -172,8 +171,8 @@ var org;
                         }
                     }
                     var row2 = tbl.insertRow();
-                    for (var index156 = 0; index156 < items.length; index156++) {
-                        var item = items[index156];
+                    for (var index159 = 0; index159 < items.length; index159++) {
+                        var item = items[index159];
                         {
                             var cell = row2.insertCell();
                             cell.innerText = item;
@@ -292,8 +291,8 @@ var org;
                                 return null;
                             }
                             var file = null;
-                            for (var index157 = 0; index157 < fl.length; index157++) {
-                                var f = fl[index157];
+                            for (var index160 = 0; index160 < fl.length; index160++) {
+                                var f = fl[index160];
                                 {
                                     file = f;
                                 }
@@ -336,8 +335,8 @@ var org;
                     this.actSel = document.getElementById("actSel");
                     var sensors = this.vishva.getSensorList();
                     var actuators = this.vishva.getActuatorList();
-                    for (var index158 = 0; index158 < sensors.length; index158++) {
-                        var sensor = sensors[index158];
+                    for (var index161 = 0; index161 < sensors.length; index161++) {
+                        var sensor = sensors[index161];
                         {
                             var opt = document.createElement("option");
                             opt.value = sensor;
@@ -345,8 +344,8 @@ var org;
                             this.sensSel.add(opt);
                         }
                     }
-                    for (var index159 = 0; index159 < actuators.length; index159++) {
-                        var actuator = actuators[index159];
+                    for (var index162 = 0; index162 < actuators.length; index162++) {
+                        var actuator = actuators[index162];
                         {
                             var opt = document.createElement("option");
                             opt.value = actuator;
@@ -525,8 +524,8 @@ var org;
                     idPrefix = idPrefix + ".";
                     var tbl = document.createElement("table");
                     var keys = Object.keys(snap);
-                    for (var index160 = 0; index160 < keys.length; index160++) {
-                        var key = keys[index160];
+                    for (var index163 = 0; index163 < keys.length; index163++) {
+                        var key = keys[index163];
                         {
                             var row = tbl.insertRow();
                             var cell = row.insertCell();
@@ -539,8 +538,8 @@ var org;
                                 var options = keyValue.values;
                                 var sel = document.createElement("select");
                                 sel.id = idPrefix + key;
-                                for (var index161 = 0; index161 < options.length; index161++) {
-                                    var option = options[index161];
+                                for (var index164 = 0; index164 < options.length; index164++) {
+                                    var option = options[index164];
                                     {
                                         var opt = document.createElement("option");
                                         if (option == keyValue.value) {
@@ -584,8 +583,8 @@ var org;
                 VishvaGUI.prototype.readForm = function (snap, idPrefix) {
                     idPrefix = idPrefix + ".";
                     var keys = Object.keys(snap);
-                    for (var index162 = 0; index162 < keys.length; index162++) {
-                        var key = keys[index162];
+                    for (var index165 = 0; index165 < keys.length; index165++) {
+                        var key = keys[index165];
                         {
                             var t = typeof snap[key];
                             if ((t == "object") && (snap[key]["type"] == "SelectType")) {
@@ -698,8 +697,8 @@ var org;
                     if (skelName != null) {
                         var range = this.vishva.getAnimationRanges();
                         var animOpt;
-                        for (var index163 = 0; index163 < range.length; index163++) {
-                            var ar = range[index163];
+                        for (var index166 = 0; index166 < range.length; index166++) {
+                            var ar = range[index166];
                             {
                                 animOpt = document.createElement("option");
                                 animOpt.value = ar.name;
@@ -832,6 +831,7 @@ var org;
                     };
                     var swAv = document.getElementById("swAv");
                     var swGnd = document.getElementById("swGnd");
+                    var parentMesh = document.getElementById("parentMesh");
                     var cloneMesh = document.getElementById("cloneMesh");
                     var delMesh = document.getElementById("delMesh");
                     var undo = document.getElementById("undo");
@@ -862,6 +862,13 @@ var org;
                         _this.downloadLink.href = downloadURL;
                         var env = $("#saveDiv");
                         env.dialog("open");
+                        return false;
+                    };
+                    parentMesh.onclick = function (e) {
+                        var err = _this.vishva.makeParent();
+                        if (err != null) {
+                            _this.showAlertDiag(err);
+                        }
                         return false;
                     };
                     cloneMesh.onclick = function (e) {

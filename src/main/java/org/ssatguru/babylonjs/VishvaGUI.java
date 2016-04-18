@@ -178,9 +178,9 @@ public class VishvaGUI {
 	private Array<JQuery> dialogs = new Array<JQuery>();
 
 	/**
-	 * resposition all dialogs to their original default postions , on window
-	 * resize without this some dialogs might go outside the window and thus
-	 * disappear
+	 * resposition all dialogs to their original default postions 
+	 * without this, a window resize could end up moving some dialogs outside the window 
+	 * and thus make them disappear
 	 * 
 	 * @param evt
 	 */
@@ -279,7 +279,7 @@ public class VishvaGUI {
 			// need to set the image size to help dialog figure out its size
 			// before image is loaded.
 			img.setAttribute("style", SMALL_ICON_SIZE + "cursor:pointer;");
-			img.setAttribute("alt", "Icon");
+			//img.setAttribute("alt", "Icon");
 			img.className = assetType;
 			img.onclick = f;
 
@@ -1173,6 +1173,7 @@ public class VishvaGUI {
 		HTMLElement swAv = document.getElementById("swAv");
 		HTMLElement swGnd = document.getElementById("swGnd");
 		// HTMLElement instMesh = document.getElementById("instMesh");
+		HTMLElement parentMesh = document.getElementById("parentMesh");
 		HTMLElement cloneMesh = document.getElementById("cloneMesh");
 		HTMLElement delMesh = document.getElementById("delMesh");
 		HTMLElement undo = document.getElementById("undo");
@@ -1211,6 +1212,17 @@ public class VishvaGUI {
 			return false;
 
 		};
+		
+		parentMesh.onclick = (e) -> {
+			String err = this.vishva.makeParent();
+			if (err != null) {
+				this.showAlertDiag(err);
+			}
+			return false;
+		};
+		
+		
+		
 		/*
 		 * instMesh.onclick = (e) -> { String err = this.vishva.instance_mesh();
 		 * if (err != null) { this.showAlertDiag(err); } return false; };

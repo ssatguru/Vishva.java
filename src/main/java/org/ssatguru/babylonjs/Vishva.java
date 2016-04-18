@@ -154,21 +154,21 @@ public class Vishva {
 		window.addEventListener("keyup", this::onKeyUp, false);
 
 		this.scenePath = scenePath;
-		//this.sceneFile = sceneFile;
+		// this.sceneFile = sceneFile;
 
 		// this.engine.hideLoadingUI();
 
 		if (sceneFile == null) {
 			onSceneLoaded(this.scene);
 		} else {
-			this.loadingStatus.innerHTML="downloading world";
+			this.loadingStatus.innerHTML = "downloading world";
 			loadSceneFile(scenePath, sceneFile + ".js", this.scene);
 		}
 
 	}
 
 	String scenePath;
-	//String sceneFile;
+	// String sceneFile;
 
 	private void loadSceneFile(String scenePath, String sceneFile, Scene scene) {
 		AssetsManager am = new AssetsManager(scene);
@@ -186,7 +186,7 @@ public class Vishva {
 		snas = (SNAserialized[]) foo.$get("VishvaSNA");
 		String sceneData = "data:" + tfat.text;
 		SceneLoader.ShowLoadingScreen = false;
-		this.loadingStatus.innerHTML="loading scene";
+		this.loadingStatus.innerHTML = "loading scene";
 		SceneLoader.Append(this.scenePath, sceneData, this.scene, this::onSceneLoaded);
 	}
 
@@ -430,6 +430,34 @@ public class Vishva {
 		swicthEditControl(inst);
 		inst.receiveShadows = true;
 		Globals.array(this.shadowGenerator.getShadowMap().renderList).push(inst);
+		return null;
+	}
+
+	public String makeParent() {
+		if (!this.isMeshSelected) {
+			return "no mesh selected";
+		}
+		if ((this.meshesPicked == null) || (this.meshesPicked.length == 1)) {
+			return "select atleast two mesh. use 'ctl' and mosue right click to select multiple meshes";
+		}
+
+		Matrix invParentMatrix = Matrix.Invert(this.meshPicked.getWorldMatrix());
+		Matrix m;
+		for (AbstractMesh mesh : this.meshesPicked) {
+			if (mesh == this.meshPicked.parent) {
+				mesh.renderOutline = false;
+				continue;
+			}
+			if (mesh != this.meshPicked) {
+				mesh.renderOutline = false;
+				m = mesh.getWorldMatrix().multiply(invParentMatrix);
+				m.decompose(mesh.scaling, mesh.rotationQuaternion, mesh.position);
+				mesh.parent = this.meshPicked;
+			}
+		}
+		this.meshPicked.renderOutline = false;
+		this.meshesPicked = null;
+
 		return null;
 	}
 
@@ -812,42 +840,19 @@ public class Vishva {
 	// ************************************
 
 	public String saveWorld() {
+
 		if (this.editControl != null) {
 			alert("cannot save during edit");
 			return null;
 		}
+
+		renameMeshIds();
 
 		cleanupSkels();
 		resetSkels(this.scene);
 
 		cleanupMats();
 		renameWorldTextures();
-
-		// StandardMaterial sm;
-		// String textureName;
-		//
-		// AbstractMesh[] meshes = this.scene.meshes;
-		//
-		// // change the location of all internal asset textures
-		// for (AbstractMesh mesh : meshes) {
-		// if (Tags.HasTags(mesh)) {
-		// if (Tags.MatchesQuery(mesh, "Vishva.internal")) {
-		// sm = (StandardMaterial) mesh.material;
-		// if (sm.diffuseTexture != null) {
-		// textureName = sm.diffuseTexture.name;
-		// if (textureName.substring(0, 2) != "..") {
-		// sm.diffuseTexture.name = "../../../" + textureName;
-		// }
-		// }
-		// }
-		// }
-		// }
-		//
-		// sm = (StandardMaterial) this.skybox.material;
-		// textureName = sm.reflectionTexture.name;
-		// if (textureName.substring(0, 2) != "..") {
-		// sm.reflectionTexture.name = "../../../" + textureName;
-		// }
 
 		jsweet.lang.Object snaObj = SNAManager.getSNAManager().serializeSnAs(this.scene);
 		String snaObjStr = JSON.stringify(snaObj);
@@ -862,7 +867,25 @@ public class Vishva {
 	}
 
 	/**
-	 * resets each skel and assign unique id to each skeleton
+	 * 
+	 * assign unique id to each mesh serialization uses mesh id to add mesh to
+	 * the shadowgenerator renderlist if two or more mesh have same id then
+	 * during desrialization only one mesh gets added to the renderlist
+	 * 
+	 */
+
+	private void renameMeshIds() {
+		int i = 0;
+		for (AbstractMesh mesh : this.scene.meshes) {
+			mesh.id = (new jsweet.lang.Number(i)).toString();
+			i++;
+		}
+	}
+
+	/**
+	 * resets each skel a assign unique id to each skeleton deserialization uses
+	 * skeleton id to associate skel with mesh if id isn't unique wrong skels
+	 * could get assigned to a mesh
 	 * 
 	 * @param scene
 	 */
@@ -872,54 +895,8 @@ public class Vishva {
 			skel.id = (new jsweet.lang.Number(i)).toString();
 			i++;
 			skel.returnToRest();
-			// for (Bone bone : skel.bones) {
-			// //bone.updateMatrix(bone.getBaseMatrix());
-			// bone.updateMatrix((Matrix) bone.$get("_restPose"));
-			//
-			// }
 		}
 	}
-
-	// private void renameTextures() {
-	// Material[] mats = this.scene.materials;
-	// StandardMaterial sm;
-	// String textureName;
-	// for (Material mat : mats) {
-	// if (mat instanceof StandardMaterial) {
-	// sm = (StandardMaterial) mat;
-	// if (sm.diffuseTexture != null) {
-	// textureName = sm.diffuseTexture.name;
-	// if (textureName.substring(0, 2) != "..") {
-	// sm.diffuseTexture.name = "../../../../" + textureName;
-	// }
-	// }
-	// if (sm.reflectionTexture != null) {
-	// textureName = sm.reflectionTexture.name;
-	// if (textureName.substring(0, 2) != "..") {
-	// sm.reflectionTexture.name = "../../../../" + textureName;
-	// }
-	// }
-	// if (sm.opacityTexture != null) {
-	// textureName = sm.opacityTexture.name;
-	// if (textureName.substring(0, 2) != "..") {
-	// sm.opacityTexture.name = "../../../../" + textureName;
-	// }
-	// }
-	// if (sm.specularTexture != null) {
-	// textureName = sm.specularTexture.name;
-	// if (textureName.substring(0, 2) != "..") {
-	// sm.specularTexture.name = "../../../../" + textureName;
-	// }
-	// }
-	// if (sm.bumpTexture != null) {
-	// textureName = sm.bumpTexture.name;
-	// if (textureName.substring(0, 2) != "..") {
-	// sm.bumpTexture.name = "../../../../" + textureName;
-	// }
-	// }
-	// }
-	// }
-	// }
 
 	private void renameWorldTextures() {
 		Material[] mats = this.scene.materials;
@@ -1158,15 +1135,14 @@ public class Vishva {
 	ShadowGenerator shadowGenerator;
 
 	private void onSceneLoaded(Scene scene) {
-		this.loadingStatus.innerHTML="checking assets";
-		
+		this.loadingStatus.innerHTML = "checking assets";
+
 		boolean avFound = false;
 		boolean skelFound = false;
 		boolean sunFound = false;
 		boolean groundFound = false;
 		boolean skyFound = false;
 		boolean cameraFound = false;
-
 
 		for (AbstractMesh mesh : scene.meshes) {
 
@@ -1187,7 +1163,6 @@ public class Vishva {
 
 			}
 		}
-
 
 		for (Skeleton skeleton : scene.skeletons) {
 			// bug? skeleton tags not supported
@@ -1425,7 +1400,7 @@ public class Vishva {
 		}
 		this.engine.hideLoadingUI();
 		this.loadingMsg.style.visibility = "hidden";
-		//this.loadingMsg.parentNode.removeChild(this.loadingMsg);
+		// this.loadingMsg.parentNode.removeChild(this.loadingMsg);
 		this.engine.runRenderLoop(() -> this.scene.render());
 	}
 
@@ -1555,7 +1530,7 @@ public class Vishva {
 			moving = true;
 		} else if (this.key.stepRight) {
 			anim = this.strafeRight;
-			stepRight = this.avatar.calcMovePOV(this.avatarSpeed / 2,-upSpeed * dir, 0);
+			stepRight = this.avatar.calcMovePOV(this.avatarSpeed / 2, -upSpeed * dir, 0);
 			this.avatar.moveWithCollisions(stepRight);
 			moving = true;
 		}
@@ -1622,6 +1597,7 @@ public class Vishva {
 	// Editor
 	// *****************************************
 	private AbstractMesh meshPicked;
+	private Array<AbstractMesh> meshesPicked;
 	private boolean isMeshSelected = false;
 	private Vector3 cameraTargetPos = new Vector3(0, 0, 0);
 	private Vector3 saveAVcameraPos = new Vector3(0, 0, 0);
@@ -1635,13 +1611,14 @@ public class Vishva {
 		if (evt.button != 2)
 			return;
 
-		if (key.ctl)
-			return;
+		// why?
+		// if (key.ctl)
+		// return;
 
 		if (pickResult.hit) {
 
 			if (!this.isMeshSelected) {
-				// if none selected hen select the one clicked
+				// if none selected then select the one clicked
 				this.isMeshSelected = true;
 				this.meshPicked = pickResult.pickedMesh;
 				this.meshPicked.showBoundingBox = this.showBoundingBox;
@@ -1649,15 +1626,24 @@ public class Vishva {
 				editControl = new EditControl((Mesh) this.meshPicked, this.mainCamera, this.canvas, 0.75);
 				editControl.enableTranslation();
 				this.editAlreadyOpen = vishvaGUI.showEditMenu();
+
+				if (key.ctl)
+					multiSelect();
+				// this.meshPicked.enableEdgesRendering();
+
 			} else {
 				if (pickResult.pickedMesh == this.meshPicked) {
-					// if clicked on already selected then focus on it
-					if (this.focusOnAv) {
-						this.saveAVcameraPos.copyFrom(this.mainCamera.position);
-						this.focusOnAv = false;
+					if (key.ctl) {
+						multiSelect();
+					} else {
+						// if already selected then focus on it
+						if (this.focusOnAv) {
+							this.saveAVcameraPos.copyFrom(this.mainCamera.position);
+							this.focusOnAv = false;
+						}
+						focusOnMesh(this.meshPicked, 50);
 					}
 
-					focusOnMesh(this.meshPicked, 50);
 				} else {
 					// switch to this
 					swicthEditControl(pickResult.pickedMesh);
@@ -1674,10 +1660,8 @@ public class Vishva {
 	 * @param mesh
 	 */
 	private void swicthEditControl(AbstractMesh mesh) {
-
 		if (this.switchDisabled)
 			return;
-
 		SNAManager.getSNAManager().enableSnAs(this.meshPicked);
 
 		this.meshPicked.showBoundingBox = false;
@@ -1685,9 +1669,34 @@ public class Vishva {
 		this.meshPicked.showBoundingBox = this.showBoundingBox;
 		editControl.switchTo((Mesh) this.meshPicked);
 		SNAManager.getSNAManager().disableSnAs((Mesh) this.meshPicked);
+
+		if (key.ctl)
+			multiSelect();
+	}
+
+	private void multiSelect() {
+		if (this.meshesPicked == null) {
+			this.meshesPicked = new jsweet.lang.Array<AbstractMesh>();
+		}
+		double i = this.meshesPicked.indexOf(this.meshPicked);
+		if (i >= 0) {
+			// if already selected then remove it
+			this.meshesPicked.splice(i, 1);
+			this.meshPicked.renderOutline = false;
+		} else {
+			this.meshesPicked.push(this.meshPicked);
+			this.meshPicked.renderOutline = true;
+		}
 	}
 
 	private void removeEditControl() {
+		if (this.meshesPicked != null) {
+			for (AbstractMesh mesh : this.meshesPicked) {
+				mesh.renderOutline = false;
+			}
+			this.meshesPicked = null;
+		}
+
 		this.isMeshSelected = false;
 		this.meshPicked.showBoundingBox = false;
 		if (!focusOnAv) {
@@ -1720,7 +1729,9 @@ public class Vishva {
 		this.mainCamera.detachControl(this.canvas);
 		this.frames = frames;
 		this.f = frames;
-		this.delta2 = mesh.position.subtract(((Vector3) this.mainCamera.target)).scale(1 / this.frames);
+		// this.delta2 = mesh.position.subtract(((Vector3)
+		// this.mainCamera.target)).scale(1 / this.frames);
+		this.delta2 = mesh.absolutePosition.subtract(((Vector3) this.mainCamera.target)).scale(1 / this.frames);
 		this.cameraAnimating = true;
 		this.scene.registerBeforeRender(animFunc2);
 	}
@@ -1784,19 +1795,24 @@ public class Vishva {
 		StandardMaterial skyboxMaterial = new StandardMaterial("skyBox", scene);
 		skyboxMaterial.backFaceCulling = false;
 		skybox.material = skyboxMaterial;
+
 		// The following makes the skybox follow our camera's position.
 		skybox.infiniteDistance = true;
+
 		// remove all light reflections on our box (the sun doesn't reflect on
 		// the sky!):
 		skyboxMaterial.diffuseColor = new Color3(0, 0, 0);
 		skyboxMaterial.specularColor = new Color3(0, 0, 0);
+
 		// apply our special sky texture to it.
 		skyboxMaterial.reflectionTexture = new CubeTexture(this.skyboxTextures, scene);
 		skyboxMaterial.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
+
 		// if you want your skybox to render behind everything else,
 		// set the skybox's renderingGroupId to 0, and every other renderable
 		// object's renderingGroupId greater than zero
 		skybox.renderingGroupId = 0;
+
 		skybox.isPickable = false;
 		Tags.AddTagsTo(skybox, "Vishva.sky Vishva.internal");
 		return skybox;
