@@ -1023,8 +1023,10 @@ public class VishvaGUI {
 		this.alertDialog = (JQuery) ((Object) $("#alertDiv"));
 		DialogOptions dos = new DialogOptions() {
 			{
-				title = "Error";
+				title = "Information";
 				autoOpen = false;
+				width = union("auto");
+				height = union("auto");
 			}
 		};
 		this.alertDialog.dialog(dos);
@@ -1173,7 +1175,11 @@ public class VishvaGUI {
 		HTMLElement swAv = document.getElementById("swAv");
 		HTMLElement swGnd = document.getElementById("swGnd");
 		// HTMLElement instMesh = document.getElementById("instMesh");
+		
 		HTMLElement parentMesh = document.getElementById("parentMesh");
+		HTMLElement removeParent = document.getElementById("removeParent");
+		HTMLElement removeChildren = document.getElementById("removeChildren");
+		
 		HTMLElement cloneMesh = document.getElementById("cloneMesh");
 		HTMLElement delMesh = document.getElementById("delMesh");
 		HTMLElement undo = document.getElementById("undo");
@@ -1221,6 +1227,21 @@ public class VishvaGUI {
 			return false;
 		};
 		
+		removeParent.onclick = (e) -> {
+			String err = this.vishva.removeParent();
+			if (err != null) {
+				this.showAlertDiag(err);
+			}
+			return false;
+		};
+		
+		removeChildren.onclick = (e) -> {
+			String err = this.vishva.removeChildren();
+			if (err != null) {
+				this.showAlertDiag(err);
+			}
+			return false;
+		};
 		
 		
 		/*

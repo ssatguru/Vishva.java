@@ -43,6 +43,7 @@ import def.babylonjs.babylon.Material;
 import def.babylonjs.babylon.Matrix;
 import def.babylonjs.babylon.Mesh;
 import def.babylonjs.babylon.MultiMaterial;
+import def.babylonjs.babylon.Node;
 import def.babylonjs.babylon.ParticleSystem;
 import def.babylonjs.babylon.PickingInfo;
 import def.babylonjs.babylon.Quaternion;
@@ -444,14 +445,21 @@ public class Vishva {
 		Matrix invParentMatrix = Matrix.Invert(this.meshPicked.getWorldMatrix());
 		Matrix m;
 		for (AbstractMesh mesh : this.meshesPicked) {
+			//if one of the mesh is a parent of this picked mesh then
+			//remove it as a parent, repostion the picked mesh in global frame of reference
 			if (mesh == this.meshPicked.parent) {
-				mesh.renderOutline = false;
-				continue;
+				m = this.meshPicked.getWorldMatrix();
+				m.decompose(this.meshPicked.scaling, this.meshPicked.rotationQuaternion, this.meshPicked.position);
+				this.meshPicked.parent=null;
 			}
+			
 			if (mesh != this.meshPicked) {
 				mesh.renderOutline = false;
+				//get the mesh FOR w.r.t the picked mesh FOR (frame of reference)
 				m = mesh.getWorldMatrix().multiply(invParentMatrix);
+				//set the parent based scale, rotation and position to one derived from this FOR
 				m.decompose(mesh.scaling, mesh.rotationQuaternion, mesh.position);
+				//change the parent to the mesh picked
 				mesh.parent = this.meshPicked;
 			}
 		}
@@ -459,6 +467,39 @@ public class Vishva {
 		this.meshesPicked = null;
 
 		return null;
+	}
+	
+	public String removeParent(){
+		if (!this.isMeshSelected) {
+			return "no mesh selected";
+		}
+		if (this.meshPicked.parent == null){
+			return "this mesh has no parent";
+		}
+		Matrix m = this.meshPicked.getWorldMatrix();
+		m.decompose(this.meshPicked.scaling, this.meshPicked.rotationQuaternion, this.meshPicked.position);
+		this.meshPicked.parent=null;
+		return "parent removed";
+	}
+	
+	public String removeChildren(){
+		if (!this.isMeshSelected) {
+			return "no mesh selected";
+		}
+		Mesh mesh = (Mesh) this.meshPicked;
+		AbstractMesh[] children = (AbstractMesh[]) mesh.getChildren();
+		if (children.length == 0){
+			return "this mesh has no children";
+		}
+		Matrix m;
+		int i=0;
+		for (AbstractMesh child:children){
+			m = child.getWorldMatrix();
+			m.decompose(child.scaling, child.rotationQuaternion, child.position);
+			child.parent = null;
+			i++;
+		}
+		return i + " children removed";
 	}
 
 	public String clone_mesh() {
