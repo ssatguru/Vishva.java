@@ -2740,8 +2740,10 @@ class ActuatorRotator extends ActuatorAbstract {
 
 	@Override
 	public void stop() {
-		a.stop();
-		onActuateEnd();
+		if (a != null){
+			a.stop();
+			onActuateEnd();
+		}
 
 	}
 
@@ -2813,8 +2815,11 @@ class ActuatorMover extends ActuatorAbstract {
 
 	@Override
 	public void stop() {
-		this.a.stop();
-		onActuateEnd();
+		if (a != null){
+			this.a.stop();
+			onActuateEnd();
+		}
+		
 
 	}
 

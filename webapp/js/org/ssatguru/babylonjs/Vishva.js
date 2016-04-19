@@ -2076,8 +2076,10 @@ var org;
                     return "Rotator";
                 };
                 ActuatorRotator.prototype.stop = function () {
-                    this.a.stop();
-                    this.onActuateEnd();
+                    if (this.a != null) {
+                        this.a.stop();
+                        this.onActuateEnd();
+                    }
                 };
                 ActuatorRotator.prototype.cleanUp = function () {
                 };
@@ -2129,8 +2131,10 @@ var org;
                     return "Mover";
                 };
                 ActuatorMover.prototype.stop = function () {
-                    this.a.stop();
-                    this.onActuateEnd();
+                    if (this.a != null) {
+                        this.a.stop();
+                        this.onActuateEnd();
+                    }
                 };
                 ActuatorMover.prototype.cleanUp = function () {
                 };
