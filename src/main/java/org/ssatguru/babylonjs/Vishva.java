@@ -445,21 +445,24 @@ public class Vishva {
 		Matrix invParentMatrix = Matrix.Invert(this.meshPicked.getWorldMatrix());
 		Matrix m;
 		for (AbstractMesh mesh : this.meshesPicked) {
-			//if one of the mesh is a parent of this picked mesh then
-			//remove it as a parent, repostion the picked mesh in global frame of reference
+			// if one of the mesh is a parent of this picked mesh then
+			// remove it as a parent, repostion the picked mesh in global frame
+			// of reference
 			if (mesh == this.meshPicked.parent) {
 				m = this.meshPicked.getWorldMatrix();
 				m.decompose(this.meshPicked.scaling, this.meshPicked.rotationQuaternion, this.meshPicked.position);
-				this.meshPicked.parent=null;
+				this.meshPicked.parent = null;
 			}
-			
+
 			if (mesh != this.meshPicked) {
 				mesh.renderOutline = false;
-				//get the mesh FOR w.r.t the picked mesh FOR (frame of reference)
+				// get the mesh FOR w.r.t the picked mesh FOR (frame of
+				// reference)
 				m = mesh.getWorldMatrix().multiply(invParentMatrix);
-				//set the parent based scale, rotation and position to one derived from this FOR
+				// set the parent based scale, rotation and position to one
+				// derived from this FOR
 				m.decompose(mesh.scaling, mesh.rotationQuaternion, mesh.position);
-				//change the parent to the mesh picked
+				// change the parent to the mesh picked
 				mesh.parent = this.meshPicked;
 			}
 		}
@@ -468,32 +471,32 @@ public class Vishva {
 
 		return null;
 	}
-	
-	public String removeParent(){
+
+	public String removeParent() {
 		if (!this.isMeshSelected) {
 			return "no mesh selected";
 		}
-		if (this.meshPicked.parent == null){
+		if (this.meshPicked.parent == null) {
 			return "this mesh has no parent";
 		}
 		Matrix m = this.meshPicked.getWorldMatrix();
 		m.decompose(this.meshPicked.scaling, this.meshPicked.rotationQuaternion, this.meshPicked.position);
-		this.meshPicked.parent=null;
+		this.meshPicked.parent = null;
 		return "parent removed";
 	}
-	
-	public String removeChildren(){
+
+	public String removeChildren() {
 		if (!this.isMeshSelected) {
 			return "no mesh selected";
 		}
 		Mesh mesh = (Mesh) this.meshPicked;
 		AbstractMesh[] children = (AbstractMesh[]) mesh.getChildren();
-		if (children.length == 0){
+		if (children.length == 0) {
 			return "this mesh has no children";
 		}
 		Matrix m;
-		int i=0;
-		for (AbstractMesh child:children){
+		int i = 0;
+		for (AbstractMesh child : children) {
 			m = child.getWorldMatrix();
 			m.decompose(child.scaling, child.rotationQuaternion, child.position);
 			child.parent = null;
@@ -506,41 +509,95 @@ public class Vishva {
 		if (!this.isMeshSelected) {
 			return "no mesh selected";
 		}
+		
+//		String name = (new jsweet.lang.Number(Date.now())).toString();
+//		AbstractMesh clone = this.meshPicked.clone(name, null, true);
+//		// cloning copies sensors and actuators key but not value
+//		// each sensor and actuator can only be attached to one mesh
+//		// so clean them up
+//		clone.$delete("sensors");
+//		clone.$delete("actuators");
+//		clone.position = this.meshPicked.position.add(new Vector3(0.1, 0.1, 0.1));
+//		clone.receiveShadows = true;
+//		Globals.array(this.shadowGenerator.getShadowMap().renderList).push(clone);
+		jsweet.lang.Array<AbstractMesh> clonedMeshesPicked = new jsweet.lang.Array<AbstractMesh>();
+		AbstractMesh clone;
+		if (this.meshesPicked != null){
+			for(AbstractMesh mesh : this.meshesPicked){
+				if (mesh != this.meshPicked){
+					clone = clonetheMesh(mesh);
+					clonedMeshesPicked.push(clone);
+				}
+			}
+		}
+		clone = clonetheMesh(this.meshPicked);
+		clonedMeshesPicked.push(clone);
+		this.meshesPicked = clonedMeshesPicked;
+		this.meshPicked = clone;
+		swicthEditControl(clone);
+		return null;
+	}
+	
+	public AbstractMesh clonetheMesh(AbstractMesh mesh){
 		String name = (new jsweet.lang.Number(Date.now())).toString();
-		AbstractMesh clone = this.meshPicked.clone(name, null, true);
+		AbstractMesh clone = mesh.clone(name, null, true);
 		// cloning copies sensors and actuators key but not value
 		// each sensor and actuator can only be attached to one mesh
 		// so clean them up
 		clone.$delete("sensors");
 		clone.$delete("actuators");
-		clone.position = this.meshPicked.position.add(new Vector3(0.1, 0.1, 0.1));
-		this.meshPicked = clone;
-		// this.editControl.switchTo((Mesh) clone);
-		swicthEditControl(clone);
+		clone.position = mesh.position.add(new Vector3(0.1, 0.1, 0.1));
 		clone.receiveShadows = true;
+		mesh.renderOutline = false;
 		Globals.array(this.shadowGenerator.getShadowMap().renderList).push(clone);
-		return null;
+		return clone;
 	}
-
 	public String delete_mesh() {
 		if (!this.isMeshSelected) {
 			return "no mesh selected";
 		}
-		removeEditControl();
 
+		if (this.meshesPicked != null) {
+			for (AbstractMesh mesh : this.meshesPicked) {
+				if (mesh != this.meshPicked) {
+					deleteTheMesh(mesh);
+				}
+			}
+			this.meshesPicked = null;
+		}
+		
+		deleteTheMesh(this.meshPicked);
+		this.meshPicked = null;
+		removeEditControl();
+		
+		// // remove all sensors and actuators asscoiated with this mesh
+		// SNAManager.getSNAManager().removeSNAs(this.meshPicked);
+		//
+		// // remove this mesh from the shadow generator map
+		// Array<AbstractMesh> meshes =
+		// Globals.array(this.shadowGenerator.getShadowMap().renderList);
+		// double i = meshes.indexOf(this.meshPicked);
+		// if (i >= 0) {
+		// meshes.splice(i, 1);
+		// }
+		//
+		// this.meshPicked.dispose();
+		return null;
+
+	}
+
+	public void deleteTheMesh(AbstractMesh mesh) {
 		// remove all sensors and actuators asscoiated with this mesh
-		SNAManager.getSNAManager().removeSNAs(this.meshPicked);
+		SNAManager.getSNAManager().removeSNAs(mesh);
 
 		// remove this mesh from the shadow generator map
 		Array<AbstractMesh> meshes = Globals.array(this.shadowGenerator.getShadowMap().renderList);
-		double i = meshes.indexOf(this.meshPicked);
+		double i = meshes.indexOf(mesh);
 		if (i >= 0) {
 			meshes.splice(i, 1);
 		}
 
-		this.meshPicked.dispose();
-		return null;
-
+		mesh.dispose();
 	}
 
 	public void setSpaceLocal(Object lcl) {
@@ -1118,7 +1175,6 @@ public class Vishva {
 		// textureName.indexOf("../") != 0) {
 		if (textureName.indexOf("vishva/") != 0 && textureName.indexOf("../") != 0) {
 			bt.name = "vishva/assets/" + this.assetType + "/" + this.file + "/" + textureName;
-			console.log("renamed to " + bt.name);
 		}
 
 	}
@@ -1731,6 +1787,7 @@ public class Vishva {
 	}
 
 	private void removeEditControl() {
+
 		if (this.meshesPicked != null) {
 			for (AbstractMesh mesh : this.meshesPicked) {
 				mesh.renderOutline = false;
@@ -1739,7 +1796,7 @@ public class Vishva {
 		}
 
 		this.isMeshSelected = false;
-		this.meshPicked.showBoundingBox = false;
+
 		if (!focusOnAv) {
 			switchFocusToAV();
 		}
@@ -1748,7 +1805,12 @@ public class Vishva {
 
 		if (!this.editAlreadyOpen)
 			this.vishvaGUI.closeEditMenu();
-		SNAManager.getSNAManager().enableSnAs(this.meshPicked);
+		
+		//if the mesh wasn't deleted during edit
+		if (this.meshPicked != null) {
+			this.meshPicked.showBoundingBox = false;
+			SNAManager.getSNAManager().enableSnAs(this.meshPicked);
+		}
 		// SNAManager.getSNAManager().processQueue(this.meshPicked);
 	}
 
@@ -2207,15 +2269,25 @@ class SNAManager {
 	public void removeSNAs(AbstractMesh mesh) {
 		Array<Actuator> actuators = (Array<Actuator>) mesh.$get("actuators");
 		if (actuators != null) {
-			for (Actuator actuator : actuators) {
-				actuator.dispose();
+			double l = actuators.length;
+			//iterate in reverse order as we will be splicing from this array
+			for (double i =l-1;i>=0;i--){
+				actuators.$get(i).dispose();
 			}
 		}
 		Array<Sensor> sensors = (Array<Sensor>) mesh.$get("sensors");
 		if (sensors != null) {
-			for (Sensor sensor : sensors) {
-				sensor.dispose();
+			double l =sensors.length;
+			//iterate in reverse order as we will be splicing from this array
+			for (double i =l-1;i>=0;i--){
+				sensors.$get(i).dispose();
 			}
+		}
+		// remove from the disabled list
+		// else we might try to start them up after edit
+		double i = snaDisabledList.indexOf(mesh);
+		if (i != -1) {
+			snaDisabledList.splice(i, 1);
 		}
 
 	}
@@ -2414,6 +2486,7 @@ interface Actuator extends SensorActuator {
 	public void cleanUp();
 
 	// TODO swicth start and actuate
+	// start is callled by SNAManager
 	public boolean start();
 
 	public void stop();
@@ -2570,6 +2643,7 @@ abstract class ActuatorAbstract implements Actuator {
 	boolean actuating = false;
 	boolean ready = true;
 	int queued = 0;
+	boolean disposed = false;
 
 	public ActuatorAbstract(Mesh mesh, ActProperties prop) {
 		this.properties = prop;
@@ -2587,7 +2661,7 @@ abstract class ActuatorAbstract implements Actuator {
 	}
 
 	final public boolean start() {
-
+		if (this.disposed) return false;
 		if (!this.ready)
 			return false;
 
@@ -2684,6 +2758,7 @@ abstract class ActuatorAbstract implements Actuator {
 	}
 
 	final public void dispose() {
+		this.disposed=true;
 		SNAManager.getSNAManager().unSubscribe(this, this.properties.signalId);
 		Array<Actuator> actuators = (Array<Actuator>) this.mesh.$get("actuators");
 		if (actuators != null) {
@@ -2694,6 +2769,7 @@ abstract class ActuatorAbstract implements Actuator {
 			}
 		}
 		cleanUp();
+		this.mesh = null;
 	}
 
 }
@@ -2740,7 +2816,7 @@ class ActuatorRotator extends ActuatorAbstract {
 
 	@Override
 	public void stop() {
-		if (a != null){
+		if (a != null) {
 			a.stop();
 			onActuateEnd();
 		}
@@ -2815,11 +2891,10 @@ class ActuatorMover extends ActuatorAbstract {
 
 	@Override
 	public void stop() {
-		if (a != null){
+		if (a != null) {
 			this.a.stop();
 			onActuateEnd();
 		}
-		
 
 	}
 
@@ -2899,8 +2974,8 @@ class ActuatorAnimator extends ActuatorAbstract {
 
 	@Override
 	public void cleanUp() {
-		// TODO Auto-generated method stub
-
+		this.properties.loop=false;
+	
 	}
 
 }
