@@ -531,9 +531,11 @@ public class Vishva {
 			}
 		}
 		clone = clonetheMesh(this.meshPicked);
-		clonedMeshesPicked.push(clone);
-		this.meshesPicked = clonedMeshesPicked;
-		this.meshPicked = clone;
+		if (this.meshesPicked !=null){
+			clonedMeshesPicked.push(clone);
+			this.meshesPicked = clonedMeshesPicked;
+		}
+		//this.meshPicked = clone;
 		swicthEditControl(clone);
 		return null;
 	}
@@ -2341,7 +2343,7 @@ class SNAManager {
 			}
 			Array<Sensor> sensors = (Array<Sensor>) mesh.$get("sensors");
 			if (sensors != null) {
-				if (meshId != null)
+				if (meshId == null)
 					meshId = getMeshVishvaUid(mesh);
 				for (Sensor sensor : sensors) {
 					sna = new SNAserialized();
@@ -2372,7 +2374,11 @@ class SNAManager {
 			}
 		}
 	}
-
+	//sometime uid generated based on time is not unique
+	//this happens when two subsequent calls are quick
+	//so save the prev uid and compare with it to make sure
+	//we are not returning the same
+	String prevUID="";
 	private String getMeshVishvaUid(AbstractMesh mesh) {
 		if (Tags.HasTags(mesh)) {
 			String[] tags = ((String) Tags.GetTags(mesh, true)).split(" ");
@@ -2383,7 +2389,13 @@ class SNAManager {
 				}
 			}
 		}
-		String uid = "Vishva.uid." + (new jsweet.lang.Number(Date.now())).toString();
+		String uid;
+		uid = "Vishva.uid." + (new jsweet.lang.Number(Date.now())).toString();
+		while (uid == prevUID){
+			console.log("regenerating uid");
+			uid = "Vishva.uid." + (new jsweet.lang.Number(Date.now())).toString();
+		}
+		prevUID = uid;
 		Tags.AddTagsTo(mesh, uid);
 		return uid;
 	}
@@ -2938,13 +2950,17 @@ class ActuatorAnimator extends ActuatorAbstract {
 				i++;
 			}
 			prop.animationRange.values = animNames;
+		}else{
+			prop.animationRange.values = new String[]{""};
 		}
 	}
 
 	@Override
 	public void actuate() {
 		AnimatorProp prop = (AnimatorProp) this.properties;
-		this.mesh.skeleton.beginAnimation(prop.animationRange.value, false, prop.rate, this::onActuateEnd);
+		if (this.mesh.skeleton != null){
+			this.mesh.skeleton.beginAnimation(prop.animationRange.value, false, prop.rate, this::onActuateEnd);
+		}
 	}
 
 	@Override

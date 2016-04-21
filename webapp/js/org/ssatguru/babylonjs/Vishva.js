@@ -362,9 +362,10 @@ var org;
                         }
                     }
                     clone = this.clonetheMesh(this.meshPicked);
-                    clonedMeshesPicked.push(clone);
-                    this.meshesPicked = clonedMeshesPicked;
-                    this.meshPicked = clone;
+                    if (this.meshesPicked != null) {
+                        clonedMeshesPicked.push(clone);
+                        this.meshesPicked = clonedMeshesPicked;
+                    }
                     this.swicthEditControl(clone);
                     return null;
                 };
@@ -1622,6 +1623,7 @@ var org;
                     this.actuatorList = ["Animator", "Mover", "Rotator", "Sound"];
                     this.snaDisabledList = new Array();
                     this.sig2actMap = new Object();
+                    this.prevUID = "";
                 }
                 SNAManager.getSNAManager = function () {
                     if (SNAManager.sm == null) {
@@ -1835,7 +1837,7 @@ var org;
                             }
                             var sensors = mesh["sensors"];
                             if (sensors != null) {
-                                if (meshId != null)
+                                if (meshId == null)
                                     meshId = this.getMeshVishvaUid(mesh);
                                 for (var index153 = 0; index153 < sensors.length; index153++) {
                                     var sensor = sensors[index153];
@@ -1884,7 +1886,14 @@ var org;
                             }
                         }
                     }
-                    var uid = "Vishva.uid." + (new Number(Date.now())).toString();
+                    var uid;
+                    uid = "Vishva.uid." + (new Number(Date.now())).toString();
+                    while ((uid == this.prevUID)) {
+                        console.log("regenerating uid");
+                        uid = "Vishva.uid." + (new Number(Date.now())).toString();
+                    }
+                    ;
+                    this.prevUID = uid;
                     Tags.AddTagsTo(mesh, uid);
                     return uid;
                 };
@@ -2210,11 +2219,16 @@ var org;
                         }
                         prop.animationRange.values = animNames;
                     }
+                    else {
+                        prop.animationRange.values = [""];
+                    }
                 }
                 ActuatorAnimator.prototype.actuate = function () {
                     var _this = this;
                     var prop = this.properties;
-                    this.mesh.skeleton.beginAnimation(prop.animationRange.value, false, prop.rate, function () { return _this.onActuateEnd(); });
+                    if (this.mesh.skeleton != null) {
+                        this.mesh.skeleton.beginAnimation(prop.animationRange.value, false, prop.rate, function () { return _this.onActuateEnd(); });
+                    }
                 };
                 ActuatorAnimator.prototype.stop = function () {
                 };
