@@ -5,5 +5,5 @@ assets={
 	vegetations:["farm_tree_01","farm_stump_01","farm_rocks_01","tree1"],
 	characters:["Joan","Vincent"],
 	vehicles:["farm_tractor_01"],
-	sounds:["door.mp3","forest-ambient.ogg","nature-ambiance.ogg","soft-forest-music.ogg","tractor.wav","hello.mp3"]
+	sounds:["door.mp3","forest-ambient.ogg","nature-ambiance.ogg","soft-forest-music.ogg","tractor.wav","hello.mp3","old_door.ogg"]
 }
