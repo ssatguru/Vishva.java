@@ -272,6 +272,9 @@ var org;
                     if (!this.isMeshSelected) {
                         return "no mesh selected";
                     }
+                    if ((this.meshPicked instanceof BABYLON.InstancedMesh)) {
+                        return ("this is an instance mesh. you cannot create instance of that");
+                    }
                     var name = (new Number(Date.now())).toString();
                     var inst = this.meshPicked.createInstance(name);
                     inst.position = this.meshPicked.position.add(new Vector3(0.1, 0.1, 0.1));
@@ -348,6 +351,9 @@ var org;
                     if (!this.isMeshSelected) {
                         return "no mesh selected";
                     }
+                    if ((this.meshPicked instanceof BABYLON.InstancedMesh)) {
+                        return ("this is an instance mesh. you cannot clone these");
+                    }
                     var clonedMeshesPicked = new Array();
                     var clone;
                     if (this.meshesPicked != null) {
@@ -355,8 +361,10 @@ var org;
                             var mesh = this.meshesPicked[index124];
                             {
                                 if (mesh != this.meshPicked) {
-                                    clone = this.clonetheMesh(mesh);
-                                    clonedMeshesPicked.push(clone);
+                                    if (!(mesh instanceof BABYLON.InstancedMesh)) {
+                                        clone = this.clonetheMesh(mesh);
+                                        clonedMeshesPicked.push(clone);
+                                    }
                                 }
                             }
                         }
@@ -699,6 +707,7 @@ var org;
                         alert("cannot save during edit");
                         return null;
                     }
+                    this.removeInstancesFromShadow();
                     this.renameMeshIds();
                     this.cleanupSkels();
                     this.resetSkels(this.scene);
@@ -710,19 +719,46 @@ var org;
                     sceneObj["VishvaSNA"] = snaObj;
                     var sceneString = JSON.stringify(sceneObj);
                     var file = new File([sceneString], "WorldFile.babylon");
+                    this.addInstancesToShadow();
                     return URL.createObjectURL(file);
+                };
+                Vishva.prototype.removeInstancesFromShadow = function () {
+                    var meshes = this.scene.meshes;
+                    for (var index127 = 0; index127 < meshes.length; index127++) {
+                        var mesh = meshes[index127];
+                        {
+                            if (mesh instanceof BABYLON.InstancedMesh) {
+                                var shadowMeshes = this.shadowGenerator.getShadowMap().renderList;
+                                var i = shadowMeshes.indexOf(mesh);
+                                if (i >= 0) {
+                                    shadowMeshes.splice(i, 1);
+                                }
+                            }
+                        }
+                    }
+                };
+                Vishva.prototype.addInstancesToShadow = function () {
+                    for (var index128 = 0; index128 < this.scene.meshes.length; index128++) {
+                        var mesh = this.scene.meshes[index128];
+                        {
+                            if (mesh instanceof BABYLON.InstancedMesh) {
+                                mesh.receiveShadows = true;
+                                (this.shadowGenerator.getShadowMap().renderList).push(mesh);
+                            }
+                        }
+                    }
                 };
                 /**
                  *
-                 * assign unique id to each mesh serialization uses mesh id to add mesh to
+                 * assign unique id to each mesh. serialization uses mesh id to add mesh to
                  * the shadowgenerator renderlist if two or more mesh have same id then
                  * during desrialization only one mesh gets added to the renderlist
                  *
                  */
                 Vishva.prototype.renameMeshIds = function () {
                     var i = 0;
-                    for (var index127 = 0; index127 < this.scene.meshes.length; index127++) {
-                        var mesh = this.scene.meshes[index127];
+                    for (var index129 = 0; index129 < this.scene.meshes.length; index129++) {
+                        var mesh = this.scene.meshes[index129];
                         {
                             mesh.id = (new Number(i)).toString();
                             i++;
@@ -738,8 +774,8 @@ var org;
                  */
                 Vishva.prototype.resetSkels = function (scene) {
                     var i = 0;
-                    for (var index128 = 0; index128 < scene.skeletons.length; index128++) {
-                        var skel = scene.skeletons[index128];
+                    for (var index130 = 0; index130 < scene.skeletons.length; index130++) {
+                        var skel = scene.skeletons[index130];
                         {
                             skel.id = (new Number(i)).toString();
                             i++;
@@ -751,8 +787,8 @@ var org;
                     var mats = this.scene.materials;
                     this.renameWorldMaterials(mats);
                     var mms = this.scene.multiMaterials;
-                    for (var index129 = 0; index129 < mms.length; index129++) {
-                        var mm = mms[index129];
+                    for (var index131 = 0; index131 < mms.length; index131++) {
+                        var mm = mms[index131];
                         {
                             this.renameWorldMaterials(mm.subMaterials);
                         }
@@ -760,8 +796,8 @@ var org;
                 };
                 Vishva.prototype.renameWorldMaterials = function (mats) {
                     var sm;
-                    for (var index130 = 0; index130 < mats.length; index130++) {
-                        var mat = mats[index130];
+                    for (var index132 = 0; index132 < mats.length; index132++) {
+                        var mat = mats[index132];
                         {
                             if (mat instanceof BABYLON.StandardMaterial) {
                                 sm = mat;
@@ -789,16 +825,16 @@ var org;
                     var meshes = this.scene.meshes;
                     var mats = new Array();
                     var mms = new Array();
-                    for (var index131 = 0; index131 < meshes.length; index131++) {
-                        var mesh = meshes[index131];
+                    for (var index133 = 0; index133 < meshes.length; index133++) {
+                        var mesh = meshes[index133];
                         {
                             if (mesh.material != null) {
                                 if (mesh.material instanceof BABYLON.MultiMaterial) {
                                     var mm = mesh.material;
                                     mms.push(mm);
                                     var ms = mm.subMaterials;
-                                    for (var index132 = 0; index132 < ms.length; index132++) {
-                                        var mat = ms[index132];
+                                    for (var index134 = 0; index134 < ms.length; index134++) {
+                                        var mat = ms[index134];
                                         {
                                             mats.push(mat);
                                         }
@@ -832,8 +868,8 @@ var org;
                 Vishva.prototype.cleanupSkels = function () {
                     var meshes = this.scene.meshes;
                     var skels = new Array();
-                    for (var index133 = 0; index133 < meshes.length; index133++) {
-                        var mesh = meshes[index133];
+                    for (var index135 = 0; index135 < meshes.length; index135++) {
+                        var mesh = meshes[index135];
                         {
                             if (mesh.skeleton != null) {
                                 skels.push(mesh.skeleton);
@@ -862,9 +898,9 @@ var org;
                 Vishva.prototype.onMeshLoaded = function (meshes, particleSystems, skeletons) {
                     var boundingRadius = this.getBoundingRadius(meshes);
                     {
-                        var array135 = meshes;
-                        for (var index134 = 0; index134 < array135.length; index134++) {
-                            var mesh = array135[index134];
+                        var array137 = meshes;
+                        for (var index136 = 0; index136 < array137.length; index136++) {
+                            var mesh = array137[index136];
                             {
                                 mesh.isPickable = true;
                                 mesh.checkCollisions = true;
@@ -876,8 +912,8 @@ var org;
                                 if (mesh.material instanceof BABYLON.MultiMaterial) {
                                     var mm = mesh.material;
                                     var mats = mm.subMaterials;
-                                    for (var index136 = 0; index136 < mats.length; index136++) {
-                                        var mat = mats[index136];
+                                    for (var index138 = 0; index138 < mats.length; index138++) {
+                                        var mat = mats[index138];
                                         {
                                             mesh.material.backFaceCulling = false;
                                             mesh.material.alpha = 1;
@@ -926,8 +962,8 @@ var org;
                  */
                 Vishva.prototype.getBoundingRadius = function (meshes) {
                     var maxRadius = 0;
-                    for (var index137 = 0; index137 < meshes.length; index137++) {
-                        var mesh = meshes[index137];
+                    for (var index139 = 0; index139 < meshes.length; index139++) {
+                        var mesh = meshes[index139];
                         {
                             var bi = mesh.getBoundingInfo();
                             var r = bi.boundingSphere.radiusWorld + mesh.position.length();
@@ -969,8 +1005,8 @@ var org;
                     var groundFound = false;
                     var skyFound = false;
                     var cameraFound = false;
-                    for (var index138 = 0; index138 < scene.meshes.length; index138++) {
-                        var mesh = scene.meshes[index138];
+                    for (var index140 = 0; index140 < scene.meshes.length; index140++) {
+                        var mesh = scene.meshes[index140];
                         {
                             if (Tags.HasTags(mesh)) {
                                 if (Tags.MatchesQuery(mesh, "Vishva.avatar")) {
@@ -990,8 +1026,8 @@ var org;
                             }
                         }
                     }
-                    for (var index139 = 0; index139 < scene.skeletons.length; index139++) {
-                        var skeleton = scene.skeletons[index139];
+                    for (var index141 = 0; index141 < scene.skeletons.length; index141++) {
+                        var skeleton = scene.skeletons[index141];
                         {
                             if (Tags.MatchesQuery(skeleton, "Vishva.skeleton") || (skeleton.name == "Vishva.skeleton")) {
                                 skelFound = true;
@@ -1002,8 +1038,8 @@ var org;
                     if (!skelFound) {
                         console.error("ALARM: No Skeleton found");
                     }
-                    for (var index140 = 0; index140 < scene.lights.length; index140++) {
-                        var light = scene.lights[index140];
+                    for (var index142 = 0; index142 < scene.lights.length; index142++) {
+                        var light = scene.lights[index142];
                         {
                             if (Tags.MatchesQuery(light, "Vishva.sun")) {
                                 sunFound = true;
@@ -1026,8 +1062,8 @@ var org;
                         this.shadowGenerator.bias = 1.0E-6;
                     }
                     else {
-                        for (var index141 = 0; index141 < scene.lights.length; index141++) {
-                            var light = scene.lights[index141];
+                        for (var index143 = 0; index143 < scene.lights.length; index143++) {
+                            var light = scene.lights[index143];
                             {
                                 if (light.id == "Vishva.dl01") {
                                     this.sunDR = light;
@@ -1038,8 +1074,17 @@ var org;
                             }
                         }
                     }
-                    for (var index142 = 0; index142 < scene.cameras.length; index142++) {
-                        var camera = scene.cameras[index142];
+                    for (var index144 = 0; index144 < this.scene.meshes.length; index144++) {
+                        var mesh = this.scene.meshes[index144];
+                        {
+                            if (mesh instanceof BABYLON.InstancedMesh) {
+                                mesh.receiveShadows = true;
+                                (this.shadowGenerator.getShadowMap().renderList).push(mesh);
+                            }
+                        }
+                    }
+                    for (var index145 = 0; index145 < scene.cameras.length; index145++) {
+                        var camera = scene.cameras[index145];
                         {
                             if (Tags.MatchesQuery(camera, "Vishva.camera")) {
                                 cameraFound = true;
@@ -1129,8 +1174,8 @@ var org;
                 };
                 Vishva.prototype.setAvatar = function (avName, meshes) {
                     var mesh;
-                    for (var index143 = 0; index143 < meshes.length; index143++) {
-                        var amesh = meshes[index143];
+                    for (var index146 = 0; index146 < meshes.length; index146++) {
+                        var amesh = meshes[index146];
                         {
                             mesh = amesh;
                             if ((mesh.id == avName)) {
@@ -1413,8 +1458,8 @@ var org;
                 };
                 Vishva.prototype.removeEditControl = function () {
                     if (this.meshesPicked != null) {
-                        for (var index144 = 0; index144 < this.meshesPicked.length; index144++) {
-                            var mesh = this.meshesPicked[index144];
+                        for (var index147 = 0; index147 < this.meshesPicked.length; index147++) {
+                            var mesh = this.meshesPicked[index147];
                             {
                                 mesh.renderOutline = false;
                             }
@@ -1556,8 +1601,8 @@ var org;
                     }
                 };
                 Vishva.prototype.setAnimationRange = function (skel) {
-                    for (var index145 = 0; index145 < this.anims.length; index145++) {
-                        var anim = this.anims[index145];
+                    for (var index148 = 0; index148 < this.anims.length; index148++) {
+                        var anim = this.anims[index148];
                         {
                             skel.createAnimationRange(anim.name, anim.s, anim.e);
                         }
@@ -1572,8 +1617,8 @@ var org;
                 Vishva.prototype.fixAnimationRanges = function (skel) {
                     var getAnimationRanges = skel["getAnimationRanges"];
                     var ranges = getAnimationRanges.call(skel);
-                    for (var index146 = 0; index146 < ranges.length; index146++) {
-                        var range = ranges[index146];
+                    for (var index149 = 0; index149 < ranges.length; index149++) {
+                        var range = ranges[index149];
                         {
                             if (range.from == range.to) {
                                 range.to++;
@@ -1698,8 +1743,8 @@ var org;
                 };
                 SNAManager.prototype.actuate = function (acts) {
                     var actuators = acts;
-                    for (var index147 = 0; index147 < actuators.length; index147++) {
-                        var actuator = actuators[index147];
+                    for (var index150 = 0; index150 < actuators.length; index150++) {
+                        var actuator = actuators[index150];
                         {
                             actuator.start();
                         }
@@ -1718,8 +1763,8 @@ var org;
                 SNAManager.prototype.processQueue = function (mesh) {
                     var actuators = mesh["actuators"];
                     if (actuators != null) {
-                        for (var index148 = 0; index148 < actuators.length; index148++) {
-                            var actuator = actuators[index148];
+                        for (var index151 = 0; index151 < actuators.length; index151++) {
+                            var actuator = actuators[index151];
                             {
                                 actuator.processQueue();
                             }
@@ -1736,8 +1781,8 @@ var org;
                     this.snaDisabledList.push(mesh);
                     var actuators = mesh["actuators"];
                     if (actuators != null) {
-                        for (var index149 = 0; index149 < actuators.length; index149++) {
-                            var actuator = actuators[index149];
+                        for (var index152 = 0; index152 < actuators.length; index152++) {
+                            var actuator = actuators[index152];
                             {
                                 if (actuator.actuating)
                                     actuator.stop();
@@ -1752,8 +1797,8 @@ var org;
                     }
                     var actuators = mesh["actuators"];
                     if (actuators != null) {
-                        for (var index150 = 0; index150 < actuators.length; index150++) {
-                            var actuator = actuators[index150];
+                        for (var index153 = 0; index153 < actuators.length; index153++) {
+                            var actuator = actuators[index153];
                             {
                                 if (actuator.properties.autoStart)
                                     actuator.start();
@@ -1816,15 +1861,15 @@ var org;
                     var sna;
                     var meshes = scene.meshes;
                     var meshId;
-                    for (var index151 = 0; index151 < meshes.length; index151++) {
-                        var mesh = meshes[index151];
+                    for (var index154 = 0; index154 < meshes.length; index154++) {
+                        var mesh = meshes[index154];
                         {
                             meshId = null;
                             var actuators = mesh["actuators"];
                             if (actuators != null) {
                                 meshId = this.getMeshVishvaUid(mesh);
-                                for (var index152 = 0; index152 < actuators.length; index152++) {
-                                    var actuator = actuators[index152];
+                                for (var index155 = 0; index155 < actuators.length; index155++) {
+                                    var actuator = actuators[index155];
                                     {
                                         sna = new SNAserialized();
                                         sna.name = actuator.getName();
@@ -1839,8 +1884,8 @@ var org;
                             if (sensors != null) {
                                 if (meshId == null)
                                     meshId = this.getMeshVishvaUid(mesh);
-                                for (var index153 = 0; index153 < sensors.length; index153++) {
-                                    var sensor = sensors[index153];
+                                for (var index156 = 0; index156 < sensors.length; index156++) {
+                                    var sensor = sensors[index156];
                                     {
                                         sna = new SNAserialized();
                                         sna.name = sensor.getName();
@@ -1858,8 +1903,8 @@ var org;
                 SNAManager.prototype.unMarshal = function (snas, scene) {
                     if (snas == null)
                         return;
-                    for (var index154 = 0; index154 < snas.length; index154++) {
-                        var sna = snas[index154];
+                    for (var index157 = 0; index157 < snas.length; index157++) {
+                        var sna = snas[index157];
                         {
                             var mesh = scene.getMeshesByTags(sna.meshId)[0];
                             if (mesh != null) {
@@ -1876,8 +1921,8 @@ var org;
                 SNAManager.prototype.getMeshVishvaUid = function (mesh) {
                     if (Tags.HasTags(mesh)) {
                         var tags = Tags.GetTags(mesh, true).split(" ");
-                        for (var index155 = 0; index155 < tags.length; index155++) {
-                            var tag = tags[index155];
+                        for (var index158 = 0; index158 < tags.length; index158++) {
+                            var tag = tags[index158];
                             {
                                 var i = tag.indexOf("Vishva.uid.");
                                 if (i >= 0) {
@@ -1992,7 +2037,6 @@ var org;
             babylonjs.SensorTouch = SensorTouch;
             var ActuatorAbstract = (function () {
                 function ActuatorAbstract(mesh, prop) {
-                    this.toggle = true;
                     this.actuating = false;
                     this.ready = true;
                     this.queued = 0;
@@ -2022,7 +2066,7 @@ var org;
                         }
                         return true;
                     }
-                    SNAManager.getSNAManager().emitSignal(this.properties.startSigId);
+                    SNAManager.getSNAManager().emitSignal(this.properties.signalStart);
                     this.actuating = true;
                     this.actuate();
                     return true;
@@ -2062,7 +2106,7 @@ var org;
                     this.processUpdateSpecific();
                 };
                 ActuatorAbstract.prototype.onActuateEnd = function () {
-                    SNAManager.getSNAManager().emitSignal(this.properties.endSigId);
+                    SNAManager.getSNAManager().emitSignal(this.properties.signalEnd);
                     this.actuating = false;
                     if (this.queued > 0) {
                         this.queued--;
@@ -2108,7 +2152,7 @@ var org;
                     var rotZ = Quaternion.RotationAxis(Axis.Z, properties.z * Math.PI / 180);
                     var abc = Quaternion.RotationYawPitchRoll(properties.y * Math.PI / 180, properties.x * Math.PI / 180, properties.z * Math.PI / 180);
                     if (properties.toggle) {
-                        if (this.toggle) {
+                        if (properties.state_toggle) {
                             nPos = cPos.multiply(abc);
                         }
                         else {
@@ -2117,7 +2161,7 @@ var org;
                     }
                     else
                         nPos = cPos.multiply(rotX).multiply(rotY).multiply(rotZ);
-                    this.toggle = !this.toggle;
+                    properties.state_toggle = !properties.state_toggle;
                     var cY = this.mesh.position.y;
                     var nY = this.mesh.position.y + 5;
                     this.a = Animation.CreateAndStartAnimation("rotate", this.mesh, "rotationQuaternion", 60, 60 * properties.duration, cPos, nPos, 0, null, function () { return _this.onActuateEnd(); });
@@ -2164,13 +2208,13 @@ var org;
                     else
                         moveBy = new Vector3(props.x, props.y, props.z);
                     if (props.toggle) {
-                        if (this.toggle) {
+                        if (props.state_toggle) {
                             nPos = cPos.add(moveBy);
                         }
                         else {
                             nPos = cPos.subtract(moveBy);
                         }
-                        this.toggle = !this.toggle;
+                        props.state_toggle = !props.state_toggle;
                     }
                     else {
                         nPos = cPos.add(moveBy);
@@ -2210,8 +2254,8 @@ var org;
                         var ranges = getAnimationRanges.call(skel);
                         var animNames = new Array(ranges.length);
                         var i = 0;
-                        for (var index156 = 0; index156 < ranges.length; index156++) {
-                            var range = ranges[index156];
+                        for (var index159 = 0; index159 < ranges.length; index159++) {
+                            var range = ranges[index159];
                             {
                                 animNames[i] = range.name;
                                 i++;
@@ -2316,6 +2360,8 @@ var org;
             var SNAproperties = (function () {
                 function SNAproperties() {
                     this.signalId = "0";
+                    this.signalEnable = "";
+                    this.signalDisble = "";
                 }
                 return SNAproperties;
             })();
@@ -2335,11 +2381,12 @@ var org;
                 __extends(ActProperties, _super);
                 function ActProperties() {
                     _super.apply(this, arguments);
+                    this.signalStart = "";
+                    this.signalEnd = "";
                     this.autoStart = false;
                     this.loop = false;
                     this.toggle = true;
-                    this.startSigId = "";
-                    this.endSigId = "";
+                    this.state_toggle = true;
                 }
                 return ActProperties;
             })(SNAproperties);

@@ -424,6 +424,9 @@ public class Vishva {
 		if (!this.isMeshSelected) {
 			return "no mesh selected";
 		}
+		if ((this.meshPicked instanceof InstancedMesh)) {
+			return ("this is an instance mesh. you cannot create instance of that");
+		}
 		String name = (new jsweet.lang.Number(Date.now())).toString();
 		InstancedMesh inst = ((Mesh) this.meshPicked).createInstance(name);
 		inst.position = this.meshPicked.position.add(new Vector3(0.1, 0.1, 0.1));
@@ -509,38 +512,46 @@ public class Vishva {
 		if (!this.isMeshSelected) {
 			return "no mesh selected";
 		}
-		
-//		String name = (new jsweet.lang.Number(Date.now())).toString();
-//		AbstractMesh clone = this.meshPicked.clone(name, null, true);
-//		// cloning copies sensors and actuators key but not value
-//		// each sensor and actuator can only be attached to one mesh
-//		// so clean them up
-//		clone.$delete("sensors");
-//		clone.$delete("actuators");
-//		clone.position = this.meshPicked.position.add(new Vector3(0.1, 0.1, 0.1));
-//		clone.receiveShadows = true;
-//		Globals.array(this.shadowGenerator.getShadowMap().renderList).push(clone);
+
+		//due to bug cannot clone instance mesh
+		if ((this.meshPicked instanceof InstancedMesh)) {
+			return ("this is an instance mesh. you cannot clone these");
+		}
+
+		// String name = (new jsweet.lang.Number(Date.now())).toString();
+		// AbstractMesh clone = this.meshPicked.clone(name, null, true);
+		// // cloning copies sensors and actuators key but not value
+		// // each sensor and actuator can only be attached to one mesh
+		// // so clean them up
+		// clone.$delete("sensors");
+		// clone.$delete("actuators");
+		// clone.position = this.meshPicked.position.add(new Vector3(0.1, 0.1,
+		// 0.1));
+		// clone.receiveShadows = true;
+		// Globals.array(this.shadowGenerator.getShadowMap().renderList).push(clone);
 		jsweet.lang.Array<AbstractMesh> clonedMeshesPicked = new jsweet.lang.Array<AbstractMesh>();
 		AbstractMesh clone;
-		if (this.meshesPicked != null){
-			for(AbstractMesh mesh : this.meshesPicked){
-				if (mesh != this.meshPicked){
-					clone = clonetheMesh(mesh);
-					clonedMeshesPicked.push(clone);
+		if (this.meshesPicked != null) {
+			for (AbstractMesh mesh : this.meshesPicked) {
+				if (mesh != this.meshPicked) {
+					if (!(mesh instanceof InstancedMesh)){
+						clone = clonetheMesh(mesh);
+						clonedMeshesPicked.push(clone);
+					}
 				}
 			}
 		}
 		clone = clonetheMesh(this.meshPicked);
-		if (this.meshesPicked !=null){
+		if (this.meshesPicked != null) {
 			clonedMeshesPicked.push(clone);
 			this.meshesPicked = clonedMeshesPicked;
 		}
-		//this.meshPicked = clone;
+		// this.meshPicked = clone;
 		swicthEditControl(clone);
 		return null;
 	}
-	
-	public AbstractMesh clonetheMesh(AbstractMesh mesh){
+
+	public AbstractMesh clonetheMesh(AbstractMesh mesh) {
 		String name = (new jsweet.lang.Number(Date.now())).toString();
 		AbstractMesh clone = mesh.clone(name, null, true);
 		// cloning copies sensors and actuators key but not value
@@ -554,6 +565,7 @@ public class Vishva {
 		Globals.array(this.shadowGenerator.getShadowMap().renderList).push(clone);
 		return clone;
 	}
+
 	public String delete_mesh() {
 		if (!this.isMeshSelected) {
 			return "no mesh selected";
@@ -567,11 +579,11 @@ public class Vishva {
 			}
 			this.meshesPicked = null;
 		}
-		
+
 		deleteTheMesh(this.meshPicked);
 		this.meshPicked = null;
 		removeEditControl();
-		
+
 		// // remove all sensors and actuators asscoiated with this mesh
 		// SNAManager.getSNAManager().removeSNAs(this.meshPicked);
 		//
@@ -946,6 +958,8 @@ public class Vishva {
 			return null;
 		}
 
+		removeInstancesFromShadow();
+
 		renameMeshIds();
 
 		cleanupSkels();
@@ -960,15 +974,45 @@ public class Vishva {
 		jsweet.lang.Object sceneObj = (jsweet.lang.Object) SceneSerializer.Serialize(this.scene);
 		sceneObj.$set("VishvaSNA", snaObj);
 		String sceneString = JSON.stringify(sceneObj);
-
 		File file = new File(new String[] { sceneString }, "WorldFile.babylon");
+
+		// add instances back into the shadowmap.
+		addInstancesToShadow();
+
 		return URL.createObjectURL(file);
 
 	}
 
+	// due to bug in 2.4 03/23/16 version if a shadowmap is serialized witn
+	// instance meshes in it
+	// then after load, rendering gives error
+	// so remove these now and add them back after load.
+	private void removeInstancesFromShadow() {
+		// remove this mesh from the shadow generator map
+		AbstractMesh[] meshes = this.scene.meshes;
+		for (AbstractMesh mesh : meshes) {
+			if (mesh instanceof InstancedMesh) {
+				Array<AbstractMesh> shadowMeshes = Globals.array(this.shadowGenerator.getShadowMap().renderList);
+				double i = shadowMeshes.indexOf(mesh);
+				if (i >= 0) {
+					shadowMeshes.splice(i, 1);
+				}
+			}
+		}
+	}
+
+	private void addInstancesToShadow() {
+		for (AbstractMesh mesh : this.scene.meshes) {
+			if (mesh instanceof InstancedMesh) {
+				mesh.receiveShadows = true;
+				Globals.array(this.shadowGenerator.getShadowMap().renderList).push(mesh);
+			}
+		}
+	}
+
 	/**
 	 * 
-	 * assign unique id to each mesh serialization uses mesh id to add mesh to
+	 * assign unique id to each mesh. serialization uses mesh id to add mesh to
 	 * the shadowgenerator renderlist if two or more mesh have same id then
 	 * during desrialization only one mesh gets added to the renderlist
 	 * 
@@ -1309,6 +1353,15 @@ public class Vishva {
 					this.shadowGenerator.bias = 0.000001;
 					this.shadowGenerator.useBlurVarianceShadowMap = true;
 				}
+			}
+		}
+
+		// due to bug in 2.4 04/23/2016 instance mesh do not show up shadwomap
+		// so need to add them seperately
+		for (AbstractMesh mesh : this.scene.meshes) {
+			if (mesh instanceof InstancedMesh) {
+				mesh.receiveShadows = true;
+				Globals.array(this.shadowGenerator.getShadowMap().renderList).push(mesh);
 			}
 		}
 
@@ -1807,8 +1860,8 @@ public class Vishva {
 
 		if (!this.editAlreadyOpen)
 			this.vishvaGUI.closeEditMenu();
-		
-		//if the mesh wasn't deleted during edit
+
+		// if the mesh wasn't deleted during edit
 		if (this.meshPicked != null) {
 			this.meshPicked.showBoundingBox = false;
 			SNAManager.getSNAManager().enableSnAs(this.meshPicked);
@@ -2272,16 +2325,16 @@ class SNAManager {
 		Array<Actuator> actuators = (Array<Actuator>) mesh.$get("actuators");
 		if (actuators != null) {
 			double l = actuators.length;
-			//iterate in reverse order as we will be splicing from this array
-			for (double i =l-1;i>=0;i--){
+			// iterate in reverse order as we will be splicing from this array
+			for (double i = l - 1; i >= 0; i--) {
 				actuators.$get(i).dispose();
 			}
 		}
 		Array<Sensor> sensors = (Array<Sensor>) mesh.$get("sensors");
 		if (sensors != null) {
-			double l =sensors.length;
-			//iterate in reverse order as we will be splicing from this array
-			for (double i =l-1;i>=0;i--){
+			double l = sensors.length;
+			// iterate in reverse order as we will be splicing from this array
+			for (double i = l - 1; i >= 0; i--) {
 				sensors.$get(i).dispose();
 			}
 		}
@@ -2374,11 +2427,13 @@ class SNAManager {
 			}
 		}
 	}
-	//sometime uid generated based on time is not unique
-	//this happens when two subsequent calls are quick
-	//so save the prev uid and compare with it to make sure
-	//we are not returning the same
-	String prevUID="";
+
+	// sometime uid generated based on time is not unique
+	// this happens when two subsequent calls are quick
+	// so save the prev uid and compare with it to make sure
+	// we are not returning the same
+	String prevUID = "";
+
 	private String getMeshVishvaUid(AbstractMesh mesh) {
 		if (Tags.HasTags(mesh)) {
 			String[] tags = ((String) Tags.GetTags(mesh, true)).split(" ");
@@ -2391,7 +2446,7 @@ class SNAManager {
 		}
 		String uid;
 		uid = "Vishva.uid." + (new jsweet.lang.Number(Date.now())).toString();
-		while (uid == prevUID){
+		while (uid == prevUID) {
 			console.log("regenerating uid");
 			uid = "Vishva.uid." + (new jsweet.lang.Number(Date.now())).toString();
 		}
@@ -2651,7 +2706,7 @@ abstract class ActuatorAbstract implements Actuator {
 	ActProperties properties;
 	Mesh mesh;
 	String signalId;
-	boolean toggle = true;
+	// boolean state_toggle = true;
 	boolean actuating = false;
 	boolean ready = true;
 	int queued = 0;
@@ -2673,7 +2728,8 @@ abstract class ActuatorAbstract implements Actuator {
 	}
 
 	final public boolean start() {
-		if (this.disposed) return false;
+		if (this.disposed)
+			return false;
 		if (!this.ready)
 			return false;
 
@@ -2688,7 +2744,7 @@ abstract class ActuatorAbstract implements Actuator {
 			}
 			return true;
 		}
-		SNAManager.getSNAManager().emitSignal(this.properties.startSigId);
+		SNAManager.getSNAManager().emitSignal(this.properties.signalStart);
 		actuating = true;
 		actuate();
 		return true;
@@ -2755,7 +2811,7 @@ abstract class ActuatorAbstract implements Actuator {
 	// abstract public void processUpdateSpecific();
 
 	public Object onActuateEnd() {
-		SNAManager.getSNAManager().emitSignal(this.properties.endSigId);
+		SNAManager.getSNAManager().emitSignal(this.properties.signalEnd);
 		actuating = false;
 		if (queued > 0) {
 			queued--;
@@ -2770,7 +2826,7 @@ abstract class ActuatorAbstract implements Actuator {
 	}
 
 	final public void dispose() {
-		this.disposed=true;
+		this.disposed = true;
 		SNAManager.getSNAManager().unSubscribe(this, this.properties.signalId);
 		Array<Actuator> actuators = (Array<Actuator>) this.mesh.$get("actuators");
 		if (actuators != null) {
@@ -2804,7 +2860,7 @@ class ActuatorRotator extends ActuatorAbstract {
 		Quaternion abc = Quaternion.RotationYawPitchRoll(properties.y * Math.PI / 180, properties.x * Math.PI / 180,
 				properties.z * Math.PI / 180);
 		if (properties.toggle) {
-			if (this.toggle) {
+			if (properties.state_toggle) {
 				// nPos = cPos.multiply(rotX).multiply(rotY).multiply(rotZ);
 				nPos = cPos.multiply(abc);
 			} else {
@@ -2814,7 +2870,7 @@ class ActuatorRotator extends ActuatorAbstract {
 			}
 		} else
 			nPos = cPos.multiply(rotX).multiply(rotY).multiply(rotZ);
-		this.toggle = !this.toggle;
+		properties.state_toggle = !properties.state_toggle;
 		double cY = mesh.position.y;
 		double nY = mesh.position.y + 5;
 		a = Animation.CreateAndStartAnimation("rotate", mesh, "rotationQuaternion", 60, 60 * properties.duration, cPos,
@@ -2882,12 +2938,12 @@ class ActuatorMover extends ActuatorAbstract {
 			moveBy = new Vector3(props.x, props.y, props.z);
 		;
 		if (props.toggle) {
-			if (this.toggle) {
+			if (props.state_toggle) {
 				nPos = cPos.add(moveBy);
 			} else {
 				nPos = cPos.subtract(moveBy);
 			}
-			this.toggle = !this.toggle;
+			props.state_toggle = !props.state_toggle;
 		} else {
 			nPos = cPos.add(moveBy);
 		}
@@ -2950,15 +3006,15 @@ class ActuatorAnimator extends ActuatorAbstract {
 				i++;
 			}
 			prop.animationRange.values = animNames;
-		}else{
-			prop.animationRange.values = new String[]{""};
+		} else {
+			prop.animationRange.values = new String[] { "" };
 		}
 	}
 
 	@Override
 	public void actuate() {
 		AnimatorProp prop = (AnimatorProp) this.properties;
-		if (this.mesh.skeleton != null){
+		if (this.mesh.skeleton != null) {
 			this.mesh.skeleton.beginAnimation(prop.animationRange.value, false, prop.rate, this::onActuateEnd);
 		}
 	}
@@ -2990,8 +3046,8 @@ class ActuatorAnimator extends ActuatorAbstract {
 
 	@Override
 	public void cleanUp() {
-		this.properties.loop=false;
-	
+		this.properties.loop = false;
+
 	}
 
 }
@@ -3083,6 +3139,8 @@ class ActuatorSound extends ActuatorAbstract {
 
 abstract class SNAproperties extends jsweet.lang.Object {
 	String signalId = "0";
+	String signalEnable = "";
+	String signalDisble = "";
 
 	public abstract SNAproperties unmarshall(jsweet.lang.Object obj);
 }
@@ -3099,11 +3157,15 @@ class SenTouchProp extends SNAproperties {
 
 abstract class ActProperties extends SNAproperties {
 
+	String signalStart = "";
+	String signalEnd = "";
 	boolean autoStart = false;
 	boolean loop = false;
 	boolean toggle = true;
-	String startSigId = "";
-	String endSigId = "";
+
+	// this should be used to store the state of toggle
+	// this will be serialized
+	boolean state_toggle = true;
 
 	@Override
 	public abstract ActProperties unmarshall(jsweet.lang.Object obj);

@@ -56,7 +56,6 @@ import jsweet.util.StringTypes;
 import jsweet.util.function.TriConsumer;
 import jsweet.util.union.Union;
 
-
 public class VishvaGUI {
 
 	private Vishva vishva;
@@ -70,15 +69,16 @@ public class VishvaGUI {
 
 	private boolean menuBarOn = false;
 
+	private final String STATE_IND = "state";
+
 	public VishvaGUI(Vishva vishva) {
 
 		this.vishva = vishva;
 
 		HTMLButtonElement showMenu = (HTMLButtonElement) document.getElementById("showMenu");
 		showMenu.style.visibility = "visible";
-		
-		
-		document.getElementById("menubar").style.visibility ="visible";
+
+		document.getElementById("menubar").style.visibility = "visible";
 		JQuery menuBar = (JQuery) ((Object) $("#menubar"));
 		JQueryPositionOptions jpo = new JQueryPositionOptions() {
 			{
@@ -102,6 +102,7 @@ public class VishvaGUI {
 		createJPOs();
 		updateAddMenu();
 		setNavMenu();
+		setEditMenu();
 
 		// edit dialog
 		createEditDiag();
@@ -133,8 +134,6 @@ public class VishvaGUI {
 		// add actuator dialog
 		createEditActDiag();
 
-		// add properties dialog
-		createPropsDiag();
 
 		window.addEventListener("resize", this::onWindowResize);
 	}
@@ -178,9 +177,9 @@ public class VishvaGUI {
 	private Array<JQuery> dialogs = new Array<JQuery>();
 
 	/**
-	 * resposition all dialogs to their original default postions 
-	 * without this, a window resize could end up moving some dialogs outside the window 
-	 * and thus make them disappear
+	 * resposition all dialogs to their original default postions without this,
+	 * a window resize could end up moving some dialogs outside the window and
+	 * thus make them disappear
 	 * 
 	 * @param evt
 	 */
@@ -279,7 +278,7 @@ public class VishvaGUI {
 			// need to set the image size to help dialog figure out its size
 			// before image is loaded.
 			img.setAttribute("style", SMALL_ICON_SIZE + "cursor:pointer;");
-			//img.setAttribute("alt", "Icon");
+			// img.setAttribute("alt", "Icon");
 			img.className = assetType;
 			img.onclick = f;
 
@@ -315,10 +314,10 @@ public class VishvaGUI {
 		em.unbind("keydown");
 
 		editDialog = (JQuery) ((Object) $("#editDiv"));
-//		JQueryPositionOptions jpo = new JQueryPositionOptions() {
-//		};
-//		jpo.at = "left center";
-//		jpo.my = "left center";
+		// JQueryPositionOptions jpo = new JQueryPositionOptions() {
+		// };
+		// jpo.at = "left center";
+		// jpo.my = "left center";
 
 		DialogOptions dos = new DialogOptions() {
 			{
@@ -379,7 +378,7 @@ public class VishvaGUI {
 			foo.click();
 			return true;
 		};
-		
+
 		HTMLButtonElement trnButton = (HTMLButtonElement) document.getElementById("trnButton");
 		trnButton.onclick = (e) -> {
 			showAlertDiag("Sorry. To be implemneted soon");
@@ -642,14 +641,14 @@ public class VishvaGUI {
 		Node node = parmDiv.firstChild;
 		if (node != null)
 			parmDiv.removeChild(node);
-		HTMLTableElement tbl = createForm(sensor.getProperties(), parmDiv.id);
+		HTMLTableElement tbl = formCreate(sensor.getProperties(), parmDiv.id);
 		parmDiv.appendChild(tbl);
 
 		DialogButtonOptions dbo = new DialogButtonOptions() {
 		};
 		dbo.text = "save";
 		dbo.click = (e) -> {
-			readForm(sensor.getProperties(), parmDiv.id);
+			formRead(sensor.getProperties(), parmDiv.id);
 			updateSensActTbl(this.vishva.getSensors(), this.sensTbl);
 			editSensDiag.dialog("close");
 			return true;
@@ -688,14 +687,14 @@ public class VishvaGUI {
 			prop.soundFile.values = this.vishva.getSoundFiles();
 			// prop.soundFile.value = prop.soundFile.values[0];
 		}
-		HTMLTableElement tbl = createForm(actuator.getProperties(), parmDiv.id);
+		HTMLTableElement tbl = formCreate(actuator.getProperties(), parmDiv.id);
 		parmDiv.appendChild(tbl);
 
 		DialogButtonOptions dbo = new DialogButtonOptions() {
 		};
 		dbo.text = "save";
 		dbo.click = (e) -> {
-			readForm(actuator.getProperties(), parmDiv.id);
+			formRead(actuator.getProperties(), parmDiv.id);
 			actuator.processUpdateGeneric();
 			updateSensActTbl(this.vishva.getActuators(), this.actTbl);
 			editActDiag.dialog("close");
@@ -706,11 +705,13 @@ public class VishvaGUI {
 	}
 
 	// TODO handle arrays and objects
-	private HTMLTableElement createForm(SNAproperties snap, String idPrefix) {
+	private HTMLTableElement formCreate(SNAproperties snap, String idPrefix) {
 		idPrefix = idPrefix + ".";
 		HTMLTableElement tbl = document.createElement(StringTypes.table);
 		String[] keys = jsweet.lang.Object.keys(snap);
 		for (String key : keys) {
+			if (key.split("_")[0] == STATE_IND)
+				continue;
 			HTMLTableRowElement row = (HTMLTableRowElement) tbl.insertRow();
 			HTMLTableCellElement cell = (HTMLTableCellElement) row.insertCell();
 			cell.innerHTML = key;
@@ -718,9 +719,11 @@ public class VishvaGUI {
 
 			// String t = (String) jsweet.lang.Globals.eval("typeof snap[key]");
 			String t = typeof(snap.$get(key));
-			//if ((t == "object") && (snap.$get(key) instanceof SelectType)) {
-			if ((t == "object") && (((jsweet.lang.Object)snap.$get(key)).$get("type")=="SelectType")) {
-				
+			// cannot use statement like "instanceof SelectType"
+			// as the class type is not persisted during serialization
+			// if ((t == "object") && (snap.$get(key) instanceof SelectType)) {
+			if ((t == "object") && (((jsweet.lang.Object) snap.$get(key)).$get("type") == "SelectType")) {
+
 				console.log("is of type SelectType");
 				SelectType keyValue = (SelectType) snap.$get(key);
 				String[] options = keyValue.values;
@@ -742,8 +745,8 @@ public class VishvaGUI {
 				inp.id = idPrefix + key;
 				inp.className = "ui-widget-content ui-corner-all";
 				inp.value = (String) snap.$get(key);
-				//if ((t == "object") && (snap.$get(key)) instanceof Range) {
-				if ((t == "object") && (((jsweet.lang.Object)snap.$get(key)).$get("type")=="Range")) {
+				// if ((t == "object") && (snap.$get(key)) instanceof Range) {
+				if ((t == "object") && (((jsweet.lang.Object) snap.$get(key)).$get("type") == "Range")) {
 					Range r = (Range) snap.$get(key);
 					inp.type = "range";
 					inp.max = (new jsweet.lang.Number(r.max)).toString();
@@ -766,21 +769,22 @@ public class VishvaGUI {
 		return tbl;
 	}
 
-	private void readForm(SNAproperties snap, String idPrefix) {
+	private void formRead(SNAproperties snap, String idPrefix) {
 		idPrefix = idPrefix + ".";
 		String[] keys = jsweet.lang.Object.keys(snap);
 		for (String key : keys) {
-			// String t = (String) jsweet.lang.Globals.eval("typeof snap[key]");
+			if (key.split("_")[0] == STATE_IND)
+				continue;
 			String t = typeof(snap.$get(key));
-			if ((t == "object") && (((jsweet.lang.Object)snap.$get(key)).$get("type")=="SelectType")) {
-			//if ((t == "object") && (snap.$get(key) instanceof SelectType)) {
+			// cannot use statement like "instanceof SelectType"
+			// as the class type is not persisted during serialization
+			if ((t == "object") && (((jsweet.lang.Object) snap.$get(key)).$get("type") == "SelectType")) {
 				SelectType s = (SelectType) snap.$get(key);
 				HTMLSelectElement sel = (HTMLSelectElement) document.getElementById(idPrefix + key);
 				s.value = sel.value;
 			} else {
 				HTMLInputElement ie = (HTMLInputElement) document.getElementById(idPrefix + key);
-				if ((t == "object") && (((jsweet.lang.Object)snap.$get(key)).$get("type")=="Range")) {
-				//if ((t == "object") && (snap.$get(key) instanceof Range)) {
+				if ((t == "object") && (((jsweet.lang.Object) snap.$get(key)).$get("type") == "Range")) {
 					Range r = (Range) snap.$get(key);
 					r.value = parseFloat(ie.value);
 				} else if ((t == "string") || (t == "number")) {
@@ -801,115 +805,14 @@ public class VishvaGUI {
 		}
 	}
 
-	// add sensor dialog
-	// private void createAddSensDiag() {
-	// // JQuery sensMenu = (JQuery) ((Object) $("#sensMenu"));
-	// // sensMenu.menu();
-	//
-	// JQuery addSensDiag = (JQuery) ((Object) $("#addSensDiag"));
-	// DialogOptions dos = new DialogOptions() {
-	// };
-	// dos.autoOpen = false;
-	// dos.modal = true;
-	// dos.resizable = false;
-	// dos.width = "auto";
-	// dos.title = "Add Sensors";
-	// DialogButtonOptions dbo = new DialogButtonOptions() {
-	// };
-	// dbo.text = "save";
-	// dbo.click = (e) -> {
-	// HTMLInputElement ele = (HTMLInputElement)
-	// document.getElementById("touchSigId");
-	// SNAproperties prop = new SNAproperties();
-	// prop.signalId = ele.value;
-	// String msg = this.vishva.add_sensor("Touch", prop);
-	// if (msg != null) {
-	// showAlertDiag(msg);
-	// addSensDiag.dialog("close");
-	// return true;
-	// }
-	// Array<SensorActuator> s = this.vishva.getSensors();
-	// updateSensActTbl(s, this.sensTbl);
-	// // refresh dialog to resize
-	// this.sNaDialog.dialog("close");
-	// this.sNaDialog.dialog("open");
-	// //
-	// addSensDiag.dialog("close");
-	// return true;
-	// };
-	// DialogButtonOptions[] dbos = new DialogButtonOptions[] { dbo };
-	// dos.buttons = union(dbos);
-	//
-	// addSensDiag.dialog(dos);
-	// }
-
-	// add sensor dialog
-	// private void createAddActDiag() {
-	// // JQuery sensMenu = (JQuery) ((Object) $("#sensMenu"));
-	// // sensMenu.menu();
-	//
-	// JQuery addActDiag = (JQuery) ((Object) $("#addActDiag"));
-	// DialogOptions dos = new DialogOptions() {
-	// };
-	// dos.autoOpen = false;
-	// dos.modal = true;
-	// dos.resizable = false;
-	// dos.width = "auto";
-	// dos.title = "Add Actuator";
-	// DialogButtonOptions dbo = new DialogButtonOptions() {
-	// };
-	// dbo.text = "save";
-	// dbo.click = (e) -> {
-	// ActMoverParm parm = new ActMoverParm();
-	// parm.signalId = ((HTMLInputElement)
-	// document.getElementById("moveSigId")).value;
-	// parm.x = Globals.parseFloat(((HTMLInputElement)
-	// document.getElementById("moveX")).value);
-	// parm.y = Globals.parseFloat(((HTMLInputElement)
-	// document.getElementById("moveY")).value);
-	// parm.z = Globals.parseFloat(((HTMLInputElement)
-	// document.getElementById("moveZ")).value);
-	// parm.duration = Globals.parseFloat(((HTMLInputElement)
-	// document.getElementById("moveDuration")).value);
-	// parm.local = ((HTMLInputElement)
-	// document.getElementById("moveLocal")).checked;
-	// parm.toggle = ((HTMLInputElement)
-	// document.getElementById("moveToggle")).checked;
-	// parm.startSigId = ((HTMLInputElement)
-	// document.getElementById("moveSSigId")).value;
-	// parm.endSigId = ((HTMLInputElement)
-	// document.getElementById("moveESigId")).value;
-	// String msg = this.vishva.addActuator("Mover", parm);
-	// if (msg != null) {
-	// showAlertDiag(msg);
-	// addActDiag.dialog("close");
-	// return true;
-	// }
-	// Array<SensorActuator> a = this.vishva.getActuators();
-	// updateSensActTbl(a, this.actTbl);
-	// // refresh dialog to resize
-	// this.sNaDialog.dialog("close");
-	// this.sNaDialog.dialog("open");
-	// //
-	// addActDiag.dialog("close");
-	// return true;
-	// };
-	// DialogButtonOptions[] dbos = new DialogButtonOptions[] { dbo };
-	// dos.buttons = union(dbos);
-	//
-	// addActDiag.dialog(dos);
-	// }
-
-	// properties dialog
-	JQuery meshPropsDiag;
+	// animation dialog
+	JQuery meshAnimDiag;
 	HTMLSelectElement animSelect;
 	HTMLInputElement animRate;
 	HTMLInputElement animLoop;
 	Skeleton skel;
 
-	private void createPropsDiag() {
-		JQuery meshPropstTab = (JQuery) ((Object) $("#meshPropsTab"));
-		meshPropstTab.tabs();
+	private void createAnimDiag() {
 
 		animSelect = (HTMLSelectElement) document.getElementById("animList");
 		animSelect.onchange = (e) -> {
@@ -943,38 +846,20 @@ public class VishvaGUI {
 			return true;
 		};
 
-		meshPropsDiag = (JQuery) ((Object) $("#meshPropsDiag"));
+		meshAnimDiag = (JQuery) ((Object) $("#meshAnimDiag"));
 		DialogOptions dos = new DialogOptions() {
 		};
 		dos.autoOpen = false;
 		dos.modal = false;
 		dos.resizable = false;
-		dos.width = 450;
-		dos.height=union("300");
-		dos.title = "Mesh Properties";
+		dos.width = "auto";
+		dos.height = union("auto");
 		dos.close = (e, ui) -> {
 			this.vishva.switchDisabled = false;
 		};
-		meshPropsDiag.dialog(dos);
+		meshAnimDiag.dialog(dos);
 	}
-
-	private void updateTransform() {
-		Vector3 loc = this.vishva.getLocation();
-		Vector3 rot = this.vishva.getRoation();
-		Vector3 scl = this.vishva.getScale();
-		document.getElementById("loc.x").innerText = toString(loc.x);
-		document.getElementById("loc.y").innerText = toString(loc.y);
-		document.getElementById("loc.z").innerText = toString(loc.z);
-
-		document.getElementById("rot.x").innerText = toString(rot.x);
-		document.getElementById("rot.y").innerText = toString(rot.y);
-		document.getElementById("rot.z").innerText = toString(rot.z);
-
-		document.getElementById("scl.x").innerText = toString(scl.x);
-		document.getElementById("scl.y").innerText = toString(scl.y);
-		document.getElementById("scl.z").innerText = toString(scl.z);
-	}
-
+	
 	private void updateAnimations() {
 		this.skel = this.vishva.getSkeleton();
 
@@ -1009,6 +894,44 @@ public class VishvaGUI {
 			}
 		}
 	}
+	
+	//create transform dialog
+	JQuery meshTransDiag;
+	
+	private void createTransDiag() {
+
+		meshTransDiag = (JQuery) ((Object) $("#meshTransDiag"));
+		DialogOptions dos = new DialogOptions() {
+		};
+		dos.autoOpen = false;
+		dos.modal = false;
+		dos.resizable = false;
+		dos.width = "auto";
+		dos.height = union("auto");
+		dos.close = (e, ui) -> {
+			this.vishva.switchDisabled = false;
+		};
+		meshTransDiag.dialog(dos);
+	}
+
+	private void updateTransform() {
+		Vector3 loc = this.vishva.getLocation();
+		Vector3 rot = this.vishva.getRoation();
+		Vector3 scl = this.vishva.getScale();
+		document.getElementById("loc.x").innerText = toString(loc.x);
+		document.getElementById("loc.y").innerText = toString(loc.y);
+		document.getElementById("loc.z").innerText = toString(loc.z);
+
+		document.getElementById("rot.x").innerText = toString(rot.x);
+		document.getElementById("rot.y").innerText = toString(rot.y);
+		document.getElementById("rot.z").innerText = toString(rot.z);
+
+		document.getElementById("scl.x").innerText = toString(scl.x);
+		document.getElementById("scl.y").innerText = toString(scl.y);
+		document.getElementById("scl.z").innerText = toString(scl.z);
+	}
+
+	
 
 	private String toString(double d) {
 		return (new jsweet.lang.Number(d)).toFixed(2).toString();
@@ -1098,12 +1021,12 @@ public class VishvaGUI {
 			} else {
 				addMenu.show("slide", slideDown);
 			}
-			addMenuOn=!addMenuOn;
+			addMenuOn = !addMenuOn;
 			// lets hide the menu the moment we click somewhere in the document
 			$(document).one("click", (jqe) -> {
-				if (addMenuOn){
+				if (addMenuOn) {
 					addMenu.menu().hide("slide", slideDown);
-					addMenuOn=false;
+					addMenuOn = false;
 				}
 				return true;
 			});
@@ -1170,22 +1093,27 @@ public class VishvaGUI {
 			this.vishva.toggleDebug();
 			return true;
 		};
-
+	}
+	
+	private void setEditMenu(){
 		// edit menu
 		HTMLElement swAv = document.getElementById("swAv");
 		HTMLElement swGnd = document.getElementById("swGnd");
-		// HTMLElement instMesh = document.getElementById("instMesh");
-		
+		HTMLElement instMesh = document.getElementById("instMesh");
+
 		HTMLElement parentMesh = document.getElementById("parentMesh");
 		HTMLElement removeParent = document.getElementById("removeParent");
 		HTMLElement removeChildren = document.getElementById("removeChildren");
-		
+
 		HTMLElement cloneMesh = document.getElementById("cloneMesh");
 		HTMLElement delMesh = document.getElementById("delMesh");
 		HTMLElement undo = document.getElementById("undo");
 		HTMLElement redo = document.getElementById("redo");
 		HTMLElement sNa = document.getElementById("sNa");
-		HTMLElement meshProps = document.getElementById("meshProps");
+		
+		HTMLElement meshAnims = document.getElementById("meshAnims");
+		HTMLElement meshMat = document.getElementById("meshMat");
+		HTMLElement meshTrans = document.getElementById("meshTrans");
 
 		swGnd.onclick = (e) -> {
 			String err = this.vishva.switchGround();
@@ -1218,7 +1146,7 @@ public class VishvaGUI {
 			return false;
 
 		};
-		
+
 		parentMesh.onclick = (e) -> {
 			String err = this.vishva.makeParent();
 			if (err != null) {
@@ -1226,7 +1154,7 @@ public class VishvaGUI {
 			}
 			return false;
 		};
-		
+
 		removeParent.onclick = (e) -> {
 			String err = this.vishva.removeParent();
 			if (err != null) {
@@ -1234,7 +1162,7 @@ public class VishvaGUI {
 			}
 			return false;
 		};
-		
+
 		removeChildren.onclick = (e) -> {
 			String err = this.vishva.removeChildren();
 			if (err != null) {
@@ -1242,12 +1170,15 @@ public class VishvaGUI {
 			}
 			return false;
 		};
-		
-		
-		/*
-		 * instMesh.onclick = (e) -> { String err = this.vishva.instance_mesh();
-		 * if (err != null) { this.showAlertDiag(err); } return false; };
-		 */
+
+		instMesh.onclick = (e) -> {
+			String err = this.vishva.instance_mesh();
+			if (err != null) {
+				this.showAlertDiag(err);
+			}
+			return false;
+		};
+
 		cloneMesh.onclick = (e) -> {
 			String err = this.vishva.clone_mesh();
 			if (err != null) {
@@ -1287,16 +1218,38 @@ public class VishvaGUI {
 			show_sNaDiag();
 			return true;
 		};
+		
+		meshMat.onclick = (e) -> {
+			this.showAlertDiag("to be implemented");
+			return true;
+		};
+		
 
-		meshProps.onclick = (e) -> {
+		meshAnims.onclick = (e) -> {
 			if (!this.vishva.anyMeshSelected()) {
 				this.showAlertDiag("no mesh selected");
 				return true;
 			}
+			if (this.meshAnimDiag == null){
+				createAnimDiag();
+			}
+			this.vishva.switchDisabled = true;
+			updateAnimations();
+			this.meshAnimDiag.dialog("open");
+			return true;
+		};
+		
+		meshTrans.onclick = (e) -> {
+			if (!this.vishva.anyMeshSelected()) {
+				this.showAlertDiag("no mesh selected");
+				return true;
+			}
+			if (this.meshTransDiag == null){
+				createTransDiag();
+			}
 			this.vishva.switchDisabled = true;
 			updateTransform();
-			updateAnimations();
-			this.meshPropsDiag.dialog("open");
+			this.meshTransDiag.dialog("open");
 			return true;
 		};
 
@@ -1305,11 +1258,10 @@ public class VishvaGUI {
 }
 
 /*
- * color pickers
- * http://www.jqueryrain.com/demo/jquery-color-picker/
+ * color pickers http://www.jqueryrain.com/demo/jquery-color-picker/
  * https://github.com/PitPik/tinyColorPicker
- * http://www.abeautifulsite.net/jquery-minicolors-a-color-selector-for-input-controls/
- * https://github.com/DavidDurman/FlexiColorPicker
+ * http://www.abeautifulsite.net/jquery-minicolors-a-color-selector-for-input-
+ * controls/ https://github.com/DavidDurman/FlexiColorPicker
  * 
  * 
  */
@@ -1328,8 +1280,12 @@ class RGB {
 
 }
 
+// for related classes
+
 class Range {
-	public final String type="Range";
+	// class type is not persisted during serialization (to JSON)
+	// as such we need to store type seperately
+	public final String type = "Range";
 	public double min;
 	public double max;
 	public double value;
@@ -1344,7 +1300,9 @@ class Range {
 }
 
 class SelectType {
-	public final String type="SelectType";
+	// class type is not persisted during serialization (to JSON)
+	// as such we need to store type seperately
+	public final String type = "SelectType";
 	public String[] values;
 	public String value;
 }

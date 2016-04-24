@@ -16,7 +16,7 @@
 <script src="lib/jquery-darkness-flat/jquery-ui.min.js"></script>
 <link href="lib/jquery-darkness-flat/jquery-ui.min.css" rel="stylesheet">
 
-<script src="lib/babylon.2.4-03-23.js"></script>
+<script src="lib/babylon.2.4.max-03-23.js"></script>
 <script src="lib/babylon.waterMaterial.min.js"></script>
 <script src="lib/pep.0.4.1.min.js"></script>
 <script src="lib/colorpicker.min.js"></script>
@@ -115,7 +115,7 @@ table, th, td {
 			<li id="removeChildren">Remove Children</li>
 			<li>-</li>
 			<li id="downMesh">Download Mesh</li>
-			<!-- <li id="instMesh">Create Instance</li> -->
+			<li id="instMesh">Create Instance</li>
 			<li id="cloneMesh">Clone Mesh</li>
 			<li id="delMesh">Delete Mesh</li>
 			<li>-</li>
@@ -124,7 +124,9 @@ table, th, td {
 			<li id="redo">Redo</li>
 			<li>-</li>
 			<li id="sNa">Sensors & Actuators</li>
-			<li id="meshProps">Properties</li>
+			<li id="meshAnims">Animations</li>
+			<li id="meshMat">Materials</li>
+			<li id="meshTrans">Transform</li>
 		</ul>
 	</div>
 
@@ -175,14 +177,8 @@ table, th, td {
 		<div id="editActDiag.parms"></div>
 	</div>
 
-	<div id="meshPropsDiag">
-		<div id="meshPropsTab">
-			<ul>
-				<li><a href="#transform">Transform</a></li>
-				<li><a href="#material">Materials</a></li>
-				<li><a href="#animations">Animations</a></li>
-			</ul>
-			<div id="transform">
+	
+	<div id="meshTransDiag" title="Transforms">
 				<table>
 					<tr>
 						<td></td>
@@ -210,8 +206,9 @@ table, th, td {
 					</tr>
 				</table>
 			</div>
-			<div id="material">TODO</div>
-			<div id="animations">
+	
+	<div id="meshAnimDiag" title="Animations">
+				<br>
 				<table>
 					<tr>
 						<td>skeleton name</td>
@@ -243,8 +240,6 @@ table, th, td {
 				</table>
 
 			</div>
-		</div>
-	</div>
 
 	<div id="envDiv" title="Environment">
 		<table style="width: 100%; text-align: center;">
