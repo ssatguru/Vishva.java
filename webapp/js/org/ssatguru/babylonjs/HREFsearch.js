@@ -33,7 +33,7 @@ var org;
                     return null;
                 };
                 return HREFsearch;
-            })();
+            }());
             babylonjs.HREFsearch = HREFsearch;
         })(babylonjs = ssatguru.babylonjs || (ssatguru.babylonjs = {}));
     })(ssatguru = org.ssatguru || (org.ssatguru = {}));

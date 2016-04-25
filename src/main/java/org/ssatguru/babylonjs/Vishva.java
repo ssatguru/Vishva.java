@@ -458,7 +458,8 @@ public class Vishva {
 			}
 
 			if (mesh != this.meshPicked) {
-				mesh.renderOutline = false;
+				//mesh.renderOutline = false;
+				mesh.showBoundingBox = false;
 				// get the mesh FOR w.r.t the picked mesh FOR (frame of
 				// reference)
 				m = mesh.getWorldMatrix().multiply(invParentMatrix);
@@ -469,7 +470,8 @@ public class Vishva {
 				mesh.parent = this.meshPicked;
 			}
 		}
-		this.meshPicked.renderOutline = false;
+		//this.meshPicked.renderOutline = false;
+		this.meshPicked.showBoundingBox = false;
 		this.meshesPicked = null;
 
 		return null;
@@ -561,7 +563,8 @@ public class Vishva {
 		clone.$delete("actuators");
 		clone.position = mesh.position.add(new Vector3(0.1, 0.1, 0.1));
 		clone.receiveShadows = true;
-		mesh.renderOutline = false;
+		//mesh.renderOutline = false;
+		mesh.showBoundingBox = false;
 		Globals.array(this.shadowGenerator.getShadowMap().renderList).push(clone);
 		return clone;
 	}
@@ -1773,7 +1776,7 @@ public class Vishva {
 				// if none selected then select the one clicked
 				this.isMeshSelected = true;
 				this.meshPicked = pickResult.pickedMesh;
-				this.meshPicked.showBoundingBox = this.showBoundingBox;
+//				this.meshPicked.showBoundingBox = this.showBoundingBox;
 				SNAManager.getSNAManager().disableSnAs((Mesh) this.meshPicked);
 				editControl = new EditControl((Mesh) this.meshPicked, this.mainCamera, this.canvas, 0.75);
 				editControl.enableTranslation();
@@ -1816,9 +1819,9 @@ public class Vishva {
 			return;
 		SNAManager.getSNAManager().enableSnAs(this.meshPicked);
 
-		this.meshPicked.showBoundingBox = false;
+//		this.meshPicked.showBoundingBox = false;
 		this.meshPicked = mesh;
-		this.meshPicked.showBoundingBox = this.showBoundingBox;
+//		this.meshPicked.showBoundingBox = this.showBoundingBox;
 		editControl.switchTo((Mesh) this.meshPicked);
 		SNAManager.getSNAManager().disableSnAs((Mesh) this.meshPicked);
 
@@ -1834,10 +1837,12 @@ public class Vishva {
 		if (i >= 0) {
 			// if already selected then remove it
 			this.meshesPicked.splice(i, 1);
-			this.meshPicked.renderOutline = false;
+			//this.meshPicked.renderOutline = false;
+			this.meshPicked.showBoundingBox = false;
 		} else {
 			this.meshesPicked.push(this.meshPicked);
-			this.meshPicked.renderOutline = true;
+			//this.meshPicked.renderOutline = true;
+			this.meshPicked.showBoundingBox = true;
 		}
 	}
 
@@ -1845,7 +1850,8 @@ public class Vishva {
 
 		if (this.meshesPicked != null) {
 			for (AbstractMesh mesh : this.meshesPicked) {
-				mesh.renderOutline = false;
+				//mesh.renderOutline = false;
+				mesh.showBoundingBox = false;
 			}
 			this.meshesPicked = null;
 		}
@@ -1863,7 +1869,7 @@ public class Vishva {
 
 		// if the mesh wasn't deleted during edit
 		if (this.meshPicked != null) {
-			this.meshPicked.showBoundingBox = false;
+//			this.meshPicked.showBoundingBox = false;
 			SNAManager.getSNAManager().enableSnAs(this.meshPicked);
 		}
 		// SNAManager.getSNAManager().processQueue(this.meshPicked);

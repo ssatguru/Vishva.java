@@ -302,14 +302,14 @@ var org;
                                 this.meshPicked.parent = null;
                             }
                             if (mesh != this.meshPicked) {
-                                mesh.renderOutline = false;
+                                mesh.showBoundingBox = false;
                                 m = mesh.getWorldMatrix().multiply(invParentMatrix);
                                 m.decompose(mesh.scaling, mesh.rotationQuaternion, mesh.position);
                                 mesh.parent = this.meshPicked;
                             }
                         }
                     }
-                    this.meshPicked.renderOutline = false;
+                    this.meshPicked.showBoundingBox = false;
                     this.meshesPicked = null;
                     return null;
                 };
@@ -384,7 +384,7 @@ var org;
                     delete clone["actuators"];
                     clone.position = mesh.position.add(new Vector3(0.1, 0.1, 0.1));
                     clone.receiveShadows = true;
-                    mesh.renderOutline = false;
+                    mesh.showBoundingBox = false;
                     (this.shadowGenerator.getShadowMap().renderList).push(clone);
                     return clone;
                 };
@@ -1398,7 +1398,6 @@ var org;
                         if (!this.isMeshSelected) {
                             this.isMeshSelected = true;
                             this.meshPicked = pickResult.pickedMesh;
-                            this.meshPicked.showBoundingBox = this.showBoundingBox;
                             SNAManager.getSNAManager().disableSnAs(this.meshPicked);
                             this.editControl = new EditControl(this.meshPicked, this.mainCamera, this.canvas, 0.75);
                             this.editControl.enableTranslation();
@@ -1434,9 +1433,7 @@ var org;
                     if (this.switchDisabled)
                         return;
                     SNAManager.getSNAManager().enableSnAs(this.meshPicked);
-                    this.meshPicked.showBoundingBox = false;
                     this.meshPicked = mesh;
-                    this.meshPicked.showBoundingBox = this.showBoundingBox;
                     this.editControl.switchTo(this.meshPicked);
                     SNAManager.getSNAManager().disableSnAs(this.meshPicked);
                     if (this.key.ctl)
@@ -1449,11 +1446,11 @@ var org;
                     var i = this.meshesPicked.indexOf(this.meshPicked);
                     if (i >= 0) {
                         this.meshesPicked.splice(i, 1);
-                        this.meshPicked.renderOutline = false;
+                        this.meshPicked.showBoundingBox = false;
                     }
                     else {
                         this.meshesPicked.push(this.meshPicked);
-                        this.meshPicked.renderOutline = true;
+                        this.meshPicked.showBoundingBox = true;
                     }
                 };
                 Vishva.prototype.removeEditControl = function () {
@@ -1461,7 +1458,7 @@ var org;
                         for (var index147 = 0; index147 < this.meshesPicked.length; index147++) {
                             var mesh = this.meshesPicked[index147];
                             {
-                                mesh.renderOutline = false;
+                                mesh.showBoundingBox = false;
                             }
                         }
                         this.meshesPicked = null;
@@ -1475,7 +1472,6 @@ var org;
                     if (!this.editAlreadyOpen)
                         this.vishvaGUI.closeEditMenu();
                     if (this.meshPicked != null) {
-                        this.meshPicked.showBoundingBox = false;
                         SNAManager.getSNAManager().enableSnAs(this.meshPicked);
                     }
                 };
@@ -1644,13 +1640,13 @@ var org;
                     }
                 };
                 return Vishva;
-            })();
+            }());
             babylonjs.Vishva = Vishva;
             var Key = (function () {
                 function Key() {
                 }
                 return Key;
-            })();
+            }());
             babylonjs.Key = Key;
             var AnimData = (function () {
                 function AnimData(name, s, e, d) {
@@ -1660,7 +1656,7 @@ var org;
                     this.r = d;
                 }
                 return AnimData;
-            })();
+            }());
             babylonjs.AnimData = AnimData;
             var SNAManager = (function () {
                 function SNAManager() {
@@ -1943,13 +1939,13 @@ var org;
                     return uid;
                 };
                 return SNAManager;
-            })();
+            }());
             babylonjs.SNAManager = SNAManager;
             var SNAserialized = (function () {
                 function SNAserialized() {
                 }
                 return SNAserialized;
-            })();
+            }());
             babylonjs.SNAserialized = SNAserialized;
             var SensorAbstract = (function () {
                 function SensorAbstract(mesh, properties) {
@@ -1998,7 +1994,7 @@ var org;
                     return "SENSOR";
                 };
                 return SensorAbstract;
-            })();
+            }());
             babylonjs.SensorAbstract = SensorAbstract;
             var SensorTouch = (function (_super) {
                 __extends(SensorTouch, _super);
@@ -2033,7 +2029,7 @@ var org;
                 SensorTouch.prototype.processUpdateSpecific = function () {
                 };
                 return SensorTouch;
-            })(SensorAbstract);
+            }(SensorAbstract));
             babylonjs.SensorTouch = SensorTouch;
             var ActuatorAbstract = (function () {
                 function ActuatorAbstract(mesh, prop) {
@@ -2134,7 +2130,7 @@ var org;
                     this.mesh = null;
                 };
                 return ActuatorAbstract;
-            })();
+            }());
             babylonjs.ActuatorAbstract = ActuatorAbstract;
             var ActuatorRotator = (function (_super) {
                 __extends(ActuatorRotator, _super);
@@ -2186,7 +2182,7 @@ var org;
                     return true;
                 };
                 return ActuatorRotator;
-            })(ActuatorAbstract);
+            }(ActuatorAbstract));
             babylonjs.ActuatorRotator = ActuatorRotator;
             var ActuatorMover = (function (_super) {
                 __extends(ActuatorMover, _super);
@@ -2241,7 +2237,7 @@ var org;
                     return true;
                 };
                 return ActuatorMover;
-            })(ActuatorAbstract);
+            }(ActuatorAbstract));
             babylonjs.ActuatorMover = ActuatorMover;
             var ActuatorAnimator = (function (_super) {
                 __extends(ActuatorAnimator, _super);
@@ -2291,7 +2287,7 @@ var org;
                     this.properties.loop = false;
                 };
                 return ActuatorAnimator;
-            })(ActuatorAbstract);
+            }(ActuatorAbstract));
             babylonjs.ActuatorAnimator = ActuatorAnimator;
             var ActuatorSound = (function (_super) {
                 __extends(ActuatorSound, _super);
@@ -2355,7 +2351,7 @@ var org;
                     return this.ready;
                 };
                 return ActuatorSound;
-            })(ActuatorAbstract);
+            }(ActuatorAbstract));
             babylonjs.ActuatorSound = ActuatorSound;
             var SNAproperties = (function () {
                 function SNAproperties() {
@@ -2364,7 +2360,7 @@ var org;
                     this.signalDisble = "";
                 }
                 return SNAproperties;
-            })();
+            }());
             babylonjs.SNAproperties = SNAproperties;
             var SenTouchProp = (function (_super) {
                 __extends(SenTouchProp, _super);
@@ -2375,7 +2371,7 @@ var org;
                     return obj;
                 };
                 return SenTouchProp;
-            })(SNAproperties);
+            }(SNAproperties));
             babylonjs.SenTouchProp = SenTouchProp;
             var ActProperties = (function (_super) {
                 __extends(ActProperties, _super);
@@ -2389,7 +2385,7 @@ var org;
                     this.state_toggle = true;
                 }
                 return ActProperties;
-            })(SNAproperties);
+            }(SNAproperties));
             babylonjs.ActProperties = ActProperties;
             var ActRotatorParm = (function (_super) {
                 __extends(ActRotatorParm, _super);
@@ -2404,7 +2400,7 @@ var org;
                     return obj;
                 };
                 return ActRotatorParm;
-            })(ActProperties);
+            }(ActProperties));
             babylonjs.ActRotatorParm = ActRotatorParm;
             var ActMoverParm = (function (_super) {
                 __extends(ActMoverParm, _super);
@@ -2420,7 +2416,7 @@ var org;
                     return obj;
                 };
                 return ActMoverParm;
-            })(ActProperties);
+            }(ActProperties));
             babylonjs.ActMoverParm = ActMoverParm;
             var AnimatorProp = (function (_super) {
                 __extends(AnimatorProp, _super);
@@ -2433,7 +2429,7 @@ var org;
                     return null;
                 };
                 return AnimatorProp;
-            })(ActProperties);
+            }(ActProperties));
             babylonjs.AnimatorProp = AnimatorProp;
             var ActSoundProp = (function (_super) {
                 __extends(ActSoundProp, _super);
@@ -2447,7 +2443,7 @@ var org;
                     return null;
                 };
                 return ActSoundProp;
-            })(ActProperties);
+            }(ActProperties));
             babylonjs.ActSoundProp = ActSoundProp;
         })(babylonjs = ssatguru.babylonjs || (ssatguru.babylonjs = {}));
     })(ssatguru = org.ssatguru || (org.ssatguru = {}));
