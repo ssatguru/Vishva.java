@@ -989,13 +989,13 @@ var org;
                 VishvaGUI.LARGE_ICON_SIZE = "width:128px;height:128px;";
                 VishvaGUI.SMALL_ICON_SIZE = "width:64px;height:64px;";
                 return VishvaGUI;
-            }());
+            })();
             babylonjs.VishvaGUI = VishvaGUI;
             var RGB = (function () {
                 function RGB() {
                 }
                 return RGB;
-            }());
+            })();
             babylonjs.RGB = RGB;
             var Range = (function () {
                 function Range(min, max, value, step) {
@@ -1006,14 +1006,14 @@ var org;
                     this.step = step;
                 }
                 return Range;
-            }());
+            })();
             babylonjs.Range = Range;
             var SelectType = (function () {
                 function SelectType() {
                     this.type = "SelectType";
                 }
                 return SelectType;
-            }());
+            })();
             babylonjs.SelectType = SelectType;
         })(babylonjs = ssatguru.babylonjs || (ssatguru.babylonjs = {}));
     })(ssatguru = org.ssatguru || (org.ssatguru = {}));

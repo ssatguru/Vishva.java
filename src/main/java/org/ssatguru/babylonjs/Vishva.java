@@ -1463,6 +1463,7 @@ public class Vishva {
 		}
 
 		if (isAvatar((Mesh) this.meshPicked)) {
+			SNAManager.getSNAManager().enableSnAs(this.avatar);
 			this.avatar.isPickable = true;
 
 			Tags.RemoveTagsFrom(this.avatar, "Vishva.avatar");
@@ -1474,7 +1475,7 @@ public class Vishva {
 			Tags.AddTagsTo(this.avatar, "Vishva.avatar");
 			Tags.AddTagsTo(this.avatarSkeleton, "Vishva.skeleton");
 			this.avatarSkeleton.name = "Vishva.skeleton";
-			setAnimationRange(this.avatarSkeleton);
+			//setAnimationRange(this.avatarSkeleton);
 
 			this.avatar.checkCollisions = true;
 			this.avatar.ellipsoid = new Vector3(0.5, 1, 0.5);
@@ -1489,6 +1490,8 @@ public class Vishva {
 			this.saveAVcameraPos = this.mainCamera.position;
 			this.focusOnAv = false;
 			removeEditControl();
+			
+			SNAManager.getSNAManager().disableSnAs((Mesh) this.avatar);
 
 		} else {
 			return "cannot use this as avatar";
@@ -2048,10 +2051,10 @@ public class Vishva {
 
 		// render();
 	}
-
 	// load default animation range
 	private void setAnimationRange(Skeleton skel) {
-		for (AnimData anim : anims) {
+		for (AnimData anim : this.anims) {
+
 			skel.createAnimationRange(anim.name, anim.s, anim.e);
 		}
 

@@ -1141,6 +1141,7 @@ var org;
                         return "no mesh selected";
                     }
                     if (this.isAvatar(this.meshPicked)) {
+                        SNAManager.getSNAManager().enableSnAs(this.avatar);
                         this.avatar.isPickable = true;
                         Tags.RemoveTagsFrom(this.avatar, "Vishva.avatar");
                         Tags.RemoveTagsFrom(this.avatarSkeleton, "Vishva.skeleton");
@@ -1150,7 +1151,6 @@ var org;
                         Tags.AddTagsTo(this.avatar, "Vishva.avatar");
                         Tags.AddTagsTo(this.avatarSkeleton, "Vishva.skeleton");
                         this.avatarSkeleton.name = "Vishva.skeleton";
-                        this.setAnimationRange(this.avatarSkeleton);
                         this.avatar.checkCollisions = true;
                         this.avatar.ellipsoid = new Vector3(0.5, 1, 0.5);
                         this.avatar.ellipsoidOffset = new Vector3(0, 2, 0);
@@ -1160,6 +1160,7 @@ var org;
                         this.saveAVcameraPos = this.mainCamera.position;
                         this.focusOnAv = false;
                         this.removeEditControl();
+                        SNAManager.getSNAManager().disableSnAs(this.avatar);
                     }
                     else {
                         return "cannot use this as avatar";
@@ -1640,13 +1641,13 @@ var org;
                     }
                 };
                 return Vishva;
-            }());
+            })();
             babylonjs.Vishva = Vishva;
             var Key = (function () {
                 function Key() {
                 }
                 return Key;
-            }());
+            })();
             babylonjs.Key = Key;
             var AnimData = (function () {
                 function AnimData(name, s, e, d) {
@@ -1656,7 +1657,7 @@ var org;
                     this.r = d;
                 }
                 return AnimData;
-            }());
+            })();
             babylonjs.AnimData = AnimData;
             var SNAManager = (function () {
                 function SNAManager() {
@@ -1939,13 +1940,13 @@ var org;
                     return uid;
                 };
                 return SNAManager;
-            }());
+            })();
             babylonjs.SNAManager = SNAManager;
             var SNAserialized = (function () {
                 function SNAserialized() {
                 }
                 return SNAserialized;
-            }());
+            })();
             babylonjs.SNAserialized = SNAserialized;
             var SensorAbstract = (function () {
                 function SensorAbstract(mesh, properties) {
@@ -1994,7 +1995,7 @@ var org;
                     return "SENSOR";
                 };
                 return SensorAbstract;
-            }());
+            })();
             babylonjs.SensorAbstract = SensorAbstract;
             var SensorTouch = (function (_super) {
                 __extends(SensorTouch, _super);
@@ -2029,7 +2030,7 @@ var org;
                 SensorTouch.prototype.processUpdateSpecific = function () {
                 };
                 return SensorTouch;
-            }(SensorAbstract));
+            })(SensorAbstract);
             babylonjs.SensorTouch = SensorTouch;
             var ActuatorAbstract = (function () {
                 function ActuatorAbstract(mesh, prop) {
@@ -2130,7 +2131,7 @@ var org;
                     this.mesh = null;
                 };
                 return ActuatorAbstract;
-            }());
+            })();
             babylonjs.ActuatorAbstract = ActuatorAbstract;
             var ActuatorRotator = (function (_super) {
                 __extends(ActuatorRotator, _super);
@@ -2182,7 +2183,7 @@ var org;
                     return true;
                 };
                 return ActuatorRotator;
-            }(ActuatorAbstract));
+            })(ActuatorAbstract);
             babylonjs.ActuatorRotator = ActuatorRotator;
             var ActuatorMover = (function (_super) {
                 __extends(ActuatorMover, _super);
@@ -2237,7 +2238,7 @@ var org;
                     return true;
                 };
                 return ActuatorMover;
-            }(ActuatorAbstract));
+            })(ActuatorAbstract);
             babylonjs.ActuatorMover = ActuatorMover;
             var ActuatorAnimator = (function (_super) {
                 __extends(ActuatorAnimator, _super);
@@ -2287,7 +2288,7 @@ var org;
                     this.properties.loop = false;
                 };
                 return ActuatorAnimator;
-            }(ActuatorAbstract));
+            })(ActuatorAbstract);
             babylonjs.ActuatorAnimator = ActuatorAnimator;
             var ActuatorSound = (function (_super) {
                 __extends(ActuatorSound, _super);
@@ -2351,7 +2352,7 @@ var org;
                     return this.ready;
                 };
                 return ActuatorSound;
-            }(ActuatorAbstract));
+            })(ActuatorAbstract);
             babylonjs.ActuatorSound = ActuatorSound;
             var SNAproperties = (function () {
                 function SNAproperties() {
@@ -2360,7 +2361,7 @@ var org;
                     this.signalDisble = "";
                 }
                 return SNAproperties;
-            }());
+            })();
             babylonjs.SNAproperties = SNAproperties;
             var SenTouchProp = (function (_super) {
                 __extends(SenTouchProp, _super);
@@ -2371,7 +2372,7 @@ var org;
                     return obj;
                 };
                 return SenTouchProp;
-            }(SNAproperties));
+            })(SNAproperties);
             babylonjs.SenTouchProp = SenTouchProp;
             var ActProperties = (function (_super) {
                 __extends(ActProperties, _super);
@@ -2385,7 +2386,7 @@ var org;
                     this.state_toggle = true;
                 }
                 return ActProperties;
-            }(SNAproperties));
+            })(SNAproperties);
             babylonjs.ActProperties = ActProperties;
             var ActRotatorParm = (function (_super) {
                 __extends(ActRotatorParm, _super);
@@ -2400,7 +2401,7 @@ var org;
                     return obj;
                 };
                 return ActRotatorParm;
-            }(ActProperties));
+            })(ActProperties);
             babylonjs.ActRotatorParm = ActRotatorParm;
             var ActMoverParm = (function (_super) {
                 __extends(ActMoverParm, _super);
@@ -2416,7 +2417,7 @@ var org;
                     return obj;
                 };
                 return ActMoverParm;
-            }(ActProperties));
+            })(ActProperties);
             babylonjs.ActMoverParm = ActMoverParm;
             var AnimatorProp = (function (_super) {
                 __extends(AnimatorProp, _super);
@@ -2429,7 +2430,7 @@ var org;
                     return null;
                 };
                 return AnimatorProp;
-            }(ActProperties));
+            })(ActProperties);
             babylonjs.AnimatorProp = AnimatorProp;
             var ActSoundProp = (function (_super) {
                 __extends(ActSoundProp, _super);
@@ -2443,7 +2444,7 @@ var org;
                     return null;
                 };
                 return ActSoundProp;
-            }(ActProperties));
+            })(ActProperties);
             babylonjs.ActSoundProp = ActSoundProp;
         })(babylonjs = ssatguru.babylonjs || (ssatguru.babylonjs = {}));
     })(ssatguru = org.ssatguru || (org.ssatguru = {}));
