@@ -1032,6 +1032,7 @@ var org;
                             if (Tags.MatchesQuery(skeleton, "Vishva.skeleton") || (skeleton.name == "Vishva.skeleton")) {
                                 skelFound = true;
                                 this.avatarSkeleton = skeleton;
+                                this.checkAnimRange(this.avatarSkeleton);
                             }
                         }
                     }
@@ -1142,15 +1143,21 @@ var org;
                     }
                     if (this.isAvatar(this.meshPicked)) {
                         SNAManager.getSNAManager().enableSnAs(this.avatar);
+                        this.avatar.rotationQuaternion = Quaternion.RotationYawPitchRoll(this.avatar.rotation.y, this.avatar.rotation.x, this.avatar.rotation.z);
                         this.avatar.isPickable = true;
                         Tags.RemoveTagsFrom(this.avatar, "Vishva.avatar");
-                        Tags.RemoveTagsFrom(this.avatarSkeleton, "Vishva.skeleton");
-                        this.avatarSkeleton.name = "";
+                        if (this.avatarSkeleton != null) {
+                            Tags.RemoveTagsFrom(this.avatarSkeleton, "Vishva.skeleton");
+                            this.avatarSkeleton.name = "";
+                        }
                         this.avatar = this.meshPicked;
                         this.avatarSkeleton = this.avatar.skeleton;
                         Tags.AddTagsTo(this.avatar, "Vishva.avatar");
-                        Tags.AddTagsTo(this.avatarSkeleton, "Vishva.skeleton");
-                        this.avatarSkeleton.name = "Vishva.skeleton";
+                        if (this.avatarSkeleton != null) {
+                            Tags.AddTagsTo(this.avatarSkeleton, "Vishva.skeleton");
+                            this.avatarSkeleton.name = "Vishva.skeleton";
+                            this.checkAnimRange(this.avatarSkeleton);
+                        }
                         this.avatar.checkCollisions = true;
                         this.avatar.ellipsoid = new Vector3(0.5, 1, 0.5);
                         this.avatar.ellipsoidOffset = new Vector3(0, 2, 0);
@@ -1173,10 +1180,28 @@ var org;
                     }
                     return true;
                 };
+                /**
+                 * check how many of standard avatar animations are present in this skeleton
+                 *
+                 * @param skel
+                 */
+                Vishva.prototype.checkAnimRange = function (skel) {
+                    for (var index146 = 0; index146 < this.anims.length; index146++) {
+                        var anim = this.anims[index146];
+                        {
+                            if (skel.getAnimationRange(anim.name) != null) {
+                                anim.exist = true;
+                            }
+                            else {
+                                anim.exist = false;
+                            }
+                        }
+                    }
+                };
                 Vishva.prototype.setAvatar = function (avName, meshes) {
                     var mesh;
-                    for (var index146 = 0; index146 < meshes.length; index146++) {
-                        var amesh = meshes[index146];
+                    for (var index147 = 0; index147 < meshes.length; index147++) {
+                        var amesh = meshes[index147];
                         {
                             mesh = amesh;
                             if ((mesh.id == avName)) {
@@ -1386,7 +1411,9 @@ var org;
                         this.avatar.rotation.y = -4.69 - this.mainCamera.alpha;
                     }
                     if (this.prevAnim != anim) {
-                        this.avatarSkeleton.beginAnimation(anim.name, true, anim.r);
+                        if (anim.exist) {
+                            this.avatarSkeleton.beginAnimation(anim.name, true, anim.r);
+                        }
                         this.prevAnim = anim;
                     }
                     this.mainCamera.target = new Vector3(this.avatar.position.x, (this.avatar.position.y + 1.5), this.avatar.position.z);
@@ -1456,8 +1483,8 @@ var org;
                 };
                 Vishva.prototype.removeEditControl = function () {
                     if (this.meshesPicked != null) {
-                        for (var index147 = 0; index147 < this.meshesPicked.length; index147++) {
-                            var mesh = this.meshesPicked[index147];
+                        for (var index148 = 0; index148 < this.meshesPicked.length; index148++) {
+                            var mesh = this.meshesPicked[index148];
                             {
                                 mesh.showBoundingBox = false;
                             }
@@ -1580,6 +1607,7 @@ var org;
                     }
                     this.fixAnimationRanges(this.avatarSkeleton);
                     this.avatar.skeleton = this.avatarSkeleton;
+                    this.checkAnimRange(this.avatarSkeleton);
                     this.avatar.rotation.y = Math.PI;
                     this.avatar.position = new Vector3(0, 0, 0);
                     this.avatar.checkCollisions = true;
@@ -1598,8 +1626,8 @@ var org;
                     }
                 };
                 Vishva.prototype.setAnimationRange = function (skel) {
-                    for (var index148 = 0; index148 < this.anims.length; index148++) {
-                        var anim = this.anims[index148];
+                    for (var index149 = 0; index149 < this.anims.length; index149++) {
+                        var anim = this.anims[index149];
                         {
                             skel.createAnimationRange(anim.name, anim.s, anim.e);
                         }
@@ -1614,8 +1642,8 @@ var org;
                 Vishva.prototype.fixAnimationRanges = function (skel) {
                     var getAnimationRanges = skel["getAnimationRanges"];
                     var ranges = getAnimationRanges.call(skel);
-                    for (var index149 = 0; index149 < ranges.length; index149++) {
-                        var range = ranges[index149];
+                    for (var index150 = 0; index150 < ranges.length; index150++) {
+                        var range = ranges[index150];
                         {
                             if (range.from == range.to) {
                                 range.to++;
@@ -1651,6 +1679,7 @@ var org;
             babylonjs.Key = Key;
             var AnimData = (function () {
                 function AnimData(name, s, e, d) {
+                    this.exist = false;
                     this.name = name;
                     this.s = s;
                     this.e = e;
@@ -1740,8 +1769,8 @@ var org;
                 };
                 SNAManager.prototype.actuate = function (acts) {
                     var actuators = acts;
-                    for (var index150 = 0; index150 < actuators.length; index150++) {
-                        var actuator = actuators[index150];
+                    for (var index151 = 0; index151 < actuators.length; index151++) {
+                        var actuator = actuators[index151];
                         {
                             actuator.start();
                         }
@@ -1760,8 +1789,8 @@ var org;
                 SNAManager.prototype.processQueue = function (mesh) {
                     var actuators = mesh["actuators"];
                     if (actuators != null) {
-                        for (var index151 = 0; index151 < actuators.length; index151++) {
-                            var actuator = actuators[index151];
+                        for (var index152 = 0; index152 < actuators.length; index152++) {
+                            var actuator = actuators[index152];
                             {
                                 actuator.processQueue();
                             }
@@ -1778,8 +1807,8 @@ var org;
                     this.snaDisabledList.push(mesh);
                     var actuators = mesh["actuators"];
                     if (actuators != null) {
-                        for (var index152 = 0; index152 < actuators.length; index152++) {
-                            var actuator = actuators[index152];
+                        for (var index153 = 0; index153 < actuators.length; index153++) {
+                            var actuator = actuators[index153];
                             {
                                 if (actuator.actuating)
                                     actuator.stop();
@@ -1794,8 +1823,8 @@ var org;
                     }
                     var actuators = mesh["actuators"];
                     if (actuators != null) {
-                        for (var index153 = 0; index153 < actuators.length; index153++) {
-                            var actuator = actuators[index153];
+                        for (var index154 = 0; index154 < actuators.length; index154++) {
+                            var actuator = actuators[index154];
                             {
                                 if (actuator.properties.autoStart)
                                     actuator.start();
@@ -1858,15 +1887,15 @@ var org;
                     var sna;
                     var meshes = scene.meshes;
                     var meshId;
-                    for (var index154 = 0; index154 < meshes.length; index154++) {
-                        var mesh = meshes[index154];
+                    for (var index155 = 0; index155 < meshes.length; index155++) {
+                        var mesh = meshes[index155];
                         {
                             meshId = null;
                             var actuators = mesh["actuators"];
                             if (actuators != null) {
                                 meshId = this.getMeshVishvaUid(mesh);
-                                for (var index155 = 0; index155 < actuators.length; index155++) {
-                                    var actuator = actuators[index155];
+                                for (var index156 = 0; index156 < actuators.length; index156++) {
+                                    var actuator = actuators[index156];
                                     {
                                         sna = new SNAserialized();
                                         sna.name = actuator.getName();
@@ -1881,8 +1910,8 @@ var org;
                             if (sensors != null) {
                                 if (meshId == null)
                                     meshId = this.getMeshVishvaUid(mesh);
-                                for (var index156 = 0; index156 < sensors.length; index156++) {
-                                    var sensor = sensors[index156];
+                                for (var index157 = 0; index157 < sensors.length; index157++) {
+                                    var sensor = sensors[index157];
                                     {
                                         sna = new SNAserialized();
                                         sna.name = sensor.getName();
@@ -1900,8 +1929,8 @@ var org;
                 SNAManager.prototype.unMarshal = function (snas, scene) {
                     if (snas == null)
                         return;
-                    for (var index157 = 0; index157 < snas.length; index157++) {
-                        var sna = snas[index157];
+                    for (var index158 = 0; index158 < snas.length; index158++) {
+                        var sna = snas[index158];
                         {
                             var mesh = scene.getMeshesByTags(sna.meshId)[0];
                             if (mesh != null) {
@@ -1918,8 +1947,8 @@ var org;
                 SNAManager.prototype.getMeshVishvaUid = function (mesh) {
                     if (Tags.HasTags(mesh)) {
                         var tags = Tags.GetTags(mesh, true).split(" ");
-                        for (var index158 = 0; index158 < tags.length; index158++) {
-                            var tag = tags[index158];
+                        for (var index159 = 0; index159 < tags.length; index159++) {
+                            var tag = tags[index159];
                             {
                                 var i = tag.indexOf("Vishva.uid.");
                                 if (i >= 0) {
@@ -2167,9 +2196,10 @@ var org;
                     return "Rotator";
                 };
                 ActuatorRotator.prototype.stop = function () {
+                    var _this = this;
                     if (this.a != null) {
                         this.a.stop();
-                        this.onActuateEnd();
+                        window.setTimeout((function () { return _this.onActuateEnd(); }), 0);
                     }
                 };
                 ActuatorRotator.prototype.cleanUp = function () {
@@ -2222,9 +2252,10 @@ var org;
                     return "Mover";
                 };
                 ActuatorMover.prototype.stop = function () {
+                    var _this = this;
                     if (this.a != null) {
                         this.a.stop();
-                        this.onActuateEnd();
+                        window.setTimeout((function () { return _this.onActuateEnd(); }), 0);
                     }
                 };
                 ActuatorMover.prototype.cleanUp = function () {
@@ -2251,8 +2282,8 @@ var org;
                         var ranges = getAnimationRanges.call(skel);
                         var animNames = new Array(ranges.length);
                         var i = 0;
-                        for (var index159 = 0; index159 < ranges.length; index159++) {
-                            var range = ranges[index159];
+                        for (var index160 = 0; index160 < ranges.length; index160++) {
+                            var range = ranges[index160];
                             {
                                 animNames[i] = range.name;
                                 i++;
@@ -2297,7 +2328,19 @@ var org;
                     Object.defineProperty(this, '__interfaces', { configurable: true, value: ["org.ssatguru.babylonjs.SensorActuator", "org.ssatguru.babylonjs.Actuator"] });
                 }
                 ActuatorSound.prototype.actuate = function () {
-                    this.sound.play();
+                    var _this = this;
+                    if (this.properties.toggle) {
+                        if (this.properties.state_toggle) {
+                            this.sound.play();
+                        }
+                        else {
+                            window.setTimeout((function () { return _this.onActuateEnd(); }), 0);
+                        }
+                        this.properties.state_toggle = !this.properties.state_toggle;
+                    }
+                    else {
+                        this.sound.play();
+                    }
                 };
                 ActuatorSound.prototype.processUpdateSpecific = function () {
                     var _this = this;
@@ -2339,10 +2382,11 @@ var org;
                     return "Sound";
                 };
                 ActuatorSound.prototype.stop = function () {
+                    var _this = this;
                     if (this.sound != null) {
                         if (this.sound.isPlaying) {
                             this.sound.stop();
-                            this.onActuateEnd();
+                            window.setTimeout((function () { return _this.onActuateEnd(); }), 0);
                         }
                     }
                 };

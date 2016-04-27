@@ -458,7 +458,7 @@ public class Vishva {
 			}
 
 			if (mesh != this.meshPicked) {
-				//mesh.renderOutline = false;
+				// mesh.renderOutline = false;
 				mesh.showBoundingBox = false;
 				// get the mesh FOR w.r.t the picked mesh FOR (frame of
 				// reference)
@@ -470,7 +470,7 @@ public class Vishva {
 				mesh.parent = this.meshPicked;
 			}
 		}
-		//this.meshPicked.renderOutline = false;
+		// this.meshPicked.renderOutline = false;
 		this.meshPicked.showBoundingBox = false;
 		this.meshesPicked = null;
 
@@ -515,7 +515,7 @@ public class Vishva {
 			return "no mesh selected";
 		}
 
-		//due to bug cannot clone instance mesh
+		// due to bug cannot clone instance mesh
 		if ((this.meshPicked instanceof InstancedMesh)) {
 			return ("this is an instance mesh. you cannot clone these");
 		}
@@ -536,7 +536,7 @@ public class Vishva {
 		if (this.meshesPicked != null) {
 			for (AbstractMesh mesh : this.meshesPicked) {
 				if (mesh != this.meshPicked) {
-					if (!(mesh instanceof InstancedMesh)){
+					if (!(mesh instanceof InstancedMesh)) {
 						clone = clonetheMesh(mesh);
 						clonedMeshesPicked.push(clone);
 					}
@@ -563,7 +563,7 @@ public class Vishva {
 		clone.$delete("actuators");
 		clone.position = mesh.position.add(new Vector3(0.1, 0.1, 0.1));
 		clone.receiveShadows = true;
-		//mesh.renderOutline = false;
+		// mesh.renderOutline = false;
 		mesh.showBoundingBox = false;
 		Globals.array(this.shadowGenerator.getShadowMap().renderList).push(clone);
 		return clone;
@@ -1315,6 +1315,7 @@ public class Vishva {
 			if (Tags.MatchesQuery(skeleton, "Vishva.skeleton") || (skeleton.name == "Vishva.skeleton")) {
 				skelFound = true;
 				this.avatarSkeleton = skeleton;
+				checkAnimRange(this.avatarSkeleton);
 			}
 
 		}
@@ -1463,19 +1464,32 @@ public class Vishva {
 		}
 
 		if (isAvatar((Mesh) this.meshPicked)) {
+
 			SNAManager.getSNAManager().enableSnAs(this.avatar);
+			// switch the current,old avatar to quaternion - all meshes are in
+			// quaternions
+			this.avatar.rotationQuaternion = Quaternion.RotationYawPitchRoll(this.avatar.rotation.y,
+					this.avatar.rotation.x, this.avatar.rotation.z);
+			// this.avatar.rotation = null;
+
 			this.avatar.isPickable = true;
 
 			Tags.RemoveTagsFrom(this.avatar, "Vishva.avatar");
-			Tags.RemoveTagsFrom(this.avatarSkeleton, "Vishva.skeleton");
-			this.avatarSkeleton.name = "";
+			if (this.avatarSkeleton != null) {
+				Tags.RemoveTagsFrom(this.avatarSkeleton, "Vishva.skeleton");
+				this.avatarSkeleton.name = "";
+			}
 
 			this.avatar = (Mesh) this.meshPicked;
 			this.avatarSkeleton = this.avatar.skeleton;
+
 			Tags.AddTagsTo(this.avatar, "Vishva.avatar");
-			Tags.AddTagsTo(this.avatarSkeleton, "Vishva.skeleton");
-			this.avatarSkeleton.name = "Vishva.skeleton";
-			//setAnimationRange(this.avatarSkeleton);
+			if (this.avatarSkeleton != null) {
+				Tags.AddTagsTo(this.avatarSkeleton, "Vishva.skeleton");
+				this.avatarSkeleton.name = "Vishva.skeleton";
+				checkAnimRange(this.avatarSkeleton);
+			}
+			// setAnimationRange(this.avatarSkeleton);
 
 			this.avatar.checkCollisions = true;
 			this.avatar.ellipsoid = new Vector3(0.5, 1, 0.5);
@@ -1483,14 +1497,14 @@ public class Vishva {
 			this.avatar.isPickable = false;
 
 			// edit control switches the system to rotationQuaternion,
-			// switch back to euler
+			// switch the new avatar to euler
 			this.avatar.rotation = this.avatar.rotationQuaternion.toEulerAngles();
 			this.avatar.rotationQuaternion = null;
 
 			this.saveAVcameraPos = this.mainCamera.position;
 			this.focusOnAv = false;
 			removeEditControl();
-			
+
 			SNAManager.getSNAManager().disableSnAs((Mesh) this.avatar);
 
 		} else {
@@ -1504,6 +1518,22 @@ public class Vishva {
 			return false;
 		}
 		return true;
+	}
+	
+	/**
+	 * check how many of standard avatar animations are present in this skeleton
+	 * 
+	 * @param skel
+	 */
+	private void checkAnimRange(Skeleton skel){
+		for (AnimData anim: this.anims){
+			if (skel.getAnimationRange(anim.name) != null){
+				anim.exist = true;
+			}else{
+				anim.exist = false;
+			}
+		}
+		
 	}
 
 	private void setAvatar(String avName, AbstractMesh[] meshes) {
@@ -1741,8 +1771,9 @@ public class Vishva {
 		}
 
 		if (this.prevAnim != anim) {
-
-			this.avatarSkeleton.beginAnimation(anim.name, true, anim.r);
+			if (anim.exist) {
+				this.avatarSkeleton.beginAnimation(anim.name, true, anim.r);
+			}
 			this.prevAnim = anim;
 		}
 
@@ -1779,7 +1810,7 @@ public class Vishva {
 				// if none selected then select the one clicked
 				this.isMeshSelected = true;
 				this.meshPicked = pickResult.pickedMesh;
-//				this.meshPicked.showBoundingBox = this.showBoundingBox;
+				// this.meshPicked.showBoundingBox = this.showBoundingBox;
 				SNAManager.getSNAManager().disableSnAs((Mesh) this.meshPicked);
 				editControl = new EditControl((Mesh) this.meshPicked, this.mainCamera, this.canvas, 0.75);
 				editControl.enableTranslation();
@@ -1822,9 +1853,9 @@ public class Vishva {
 			return;
 		SNAManager.getSNAManager().enableSnAs(this.meshPicked);
 
-//		this.meshPicked.showBoundingBox = false;
+		// this.meshPicked.showBoundingBox = false;
 		this.meshPicked = mesh;
-//		this.meshPicked.showBoundingBox = this.showBoundingBox;
+		// this.meshPicked.showBoundingBox = this.showBoundingBox;
 		editControl.switchTo((Mesh) this.meshPicked);
 		SNAManager.getSNAManager().disableSnAs((Mesh) this.meshPicked);
 
@@ -1840,11 +1871,11 @@ public class Vishva {
 		if (i >= 0) {
 			// if already selected then remove it
 			this.meshesPicked.splice(i, 1);
-			//this.meshPicked.renderOutline = false;
+			// this.meshPicked.renderOutline = false;
 			this.meshPicked.showBoundingBox = false;
 		} else {
 			this.meshesPicked.push(this.meshPicked);
-			//this.meshPicked.renderOutline = true;
+			// this.meshPicked.renderOutline = true;
 			this.meshPicked.showBoundingBox = true;
 		}
 	}
@@ -1853,7 +1884,7 @@ public class Vishva {
 
 		if (this.meshesPicked != null) {
 			for (AbstractMesh mesh : this.meshesPicked) {
-				//mesh.renderOutline = false;
+				// mesh.renderOutline = false;
 				mesh.showBoundingBox = false;
 			}
 			this.meshesPicked = null;
@@ -1872,7 +1903,7 @@ public class Vishva {
 
 		// if the mesh wasn't deleted during edit
 		if (this.meshPicked != null) {
-//			this.meshPicked.showBoundingBox = false;
+			// this.meshPicked.showBoundingBox = false;
 			SNAManager.getSNAManager().enableSnAs(this.meshPicked);
 		}
 		// SNAManager.getSNAManager().processQueue(this.meshPicked);
@@ -2023,9 +2054,11 @@ public class Vishva {
 		}
 
 		// setAnimationRange(this.avatarSkeleton);
+		
 		fixAnimationRanges(this.avatarSkeleton);
 		this.avatar.skeleton = this.avatarSkeleton;
-
+		checkAnimRange(this.avatarSkeleton);
+		
 		this.avatar.rotation.y = Math.PI;
 		this.avatar.position = new Vector3(0, 0, 0);
 		this.avatar.checkCollisions = true;
@@ -2051,6 +2084,7 @@ public class Vishva {
 
 		// render();
 	}
+
 	// load default animation range
 	private void setAnimationRange(Skeleton skel) {
 		for (AnimData anim : this.anims) {
@@ -2143,6 +2177,7 @@ class AnimData {
 	public int s;
 	public int e;
 	public double r;
+	public boolean exist = false;
 
 	public AnimData(String name, int s, int e, double d) {
 		this.name = name;
@@ -2895,7 +2930,8 @@ class ActuatorRotator extends ActuatorAbstract {
 	public void stop() {
 		if (a != null) {
 			a.stop();
-			onActuateEnd();
+			// onActuateEnd();
+			window.setTimeout(function(this::onActuateEnd), 0);
 		}
 
 	}
@@ -2970,7 +3006,8 @@ class ActuatorMover extends ActuatorAbstract {
 	public void stop() {
 		if (a != null) {
 			this.a.stop();
-			onActuateEnd();
+			// onActuateEnd();
+			window.setTimeout(function(this::onActuateEnd), 0);
 		}
 
 	}
@@ -3071,7 +3108,16 @@ class ActuatorSound extends ActuatorAbstract {
 
 	@Override
 	public void actuate() {
-		sound.play();
+		if (this.properties.toggle) {
+			if (this.properties.state_toggle) {
+				sound.play();
+			} else {
+				window.setTimeout(function(this::onActuateEnd), 0);
+			}
+			this.properties.state_toggle = !this.properties.state_toggle;
+		} else {
+			sound.play();
+		}
 	}
 
 	@Override
@@ -3129,7 +3175,8 @@ class ActuatorSound extends ActuatorAbstract {
 		if (this.sound != null) {
 			if (this.sound.isPlaying) {
 				sound.stop();
-				onActuateEnd();
+				// onActuateEnd();
+				window.setTimeout(function(this::onActuateEnd), 0);
 			}
 		}
 	}
