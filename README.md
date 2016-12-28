@@ -8,7 +8,9 @@ A simple live scene editor for [BabylonJS](http://www.babylonjs.com/), a 3D HTML
 
 Developed in Java using [JSweet](http://www.jsweet.org/), a java to javscript transpiler
 
-More info at [http://ssatguru.appspot.com/BabylonJS-Vishva/intro.html](http://ssatguru.appspot.com/BabylonJS-Vishva/intro.html)
+For intro and demo see [http://ssatguru.appspot.com/BabylonJS-Vishva/intro.html](http://ssatguru.appspot.com/BabylonJS-Vishva/intro.html)
+
+For details see [wiki at https://github.com/ssatguru/Vishva/wiki](https://github.com/ssatguru/Vishva/wiki)
 
 ## to run
 
